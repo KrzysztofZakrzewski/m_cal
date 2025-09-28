@@ -3,3 +3,6 @@ logs/
 img/
 receipt/
 json_calories_table/
+temporary_json_from_recepit/*
+# json_from_recepit.json
+!.gitkeep
