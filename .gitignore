@@ -7,4 +7,5 @@ json_calories_table/
 # json_from_recepit.json
 temporary_json_from_receipt/*
 temporary_json_parsed/*
+main_dataframe/*
 !.gitkeep
