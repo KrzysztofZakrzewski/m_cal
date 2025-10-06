@@ -9,3 +9,5 @@ temporary_json_from_receipt/*
 temporary_json_parsed/*
 main_dataframe/*
 !.gitkeep
+__pycache__/
+paths.py

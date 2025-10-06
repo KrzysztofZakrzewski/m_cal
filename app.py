@@ -25,34 +25,57 @@ import pdfplumber
 import streamlit as st
 
 
+
 ###################
 ### MAKE DISR
+from dirs import DIRS
+# from paths import PATHS
 
+##############
+## PATHS
 
-# PDF
-if "pdf_path" not in st.session_state:
-    pdf_path = Path("./pdf")
-    pdf_path.mkdir(parents=True, exist_ok=True)
-    st.session_state["pdf_path"] = pdf_path
-
-
-# Logs
-os.makedirs("logs", exist_ok=True)
+# LOGS
 LOGS_PATH = Path("logs")
 LOGS_FILE = LOGS_PATH / 'logs.log'
 
+# PDF
+raw_pdf_PATH = Path("./pdf")
+raw_pdf_PATH.mkdir(parents=True, exist_ok=True)
+pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'
+
+# DataFrame
+main_dataframe_PATH = Path("main_dataframe")
+
+# Calories Table in json
+json_calories_table_PATH = Path('json_calories_table')
+
+# Receipt
+temporary_json_from_receipt_PATH = Path('temporary_json_from_receipt')
+temporary_json_parsed_PATH = Path('temporary_json_parsed')
 
 
 
+# url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
 
-url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
+# parsed_url = urlparse(url)
+# filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
 
-parsed_url = urlparse(url)
-filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
+# LOGS_FILE = DIRS["logs"] / "logs.log"
+LOGS_PATH = Path("logs")
+LOGS_FILE = LOGS_PATH / 'logs.log'
 
-# print(filename)
+logging.basicConfig(
+    filename=str(LOGS_FILE),  # will create the logs folder (if it doesn't exist) and the errors.log file | str ensures compatibility with older Python
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
 
 BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf'
+
+
 
 def scrape_pdf(url):
     try:
@@ -94,3 +117,5 @@ def scrape_pdf(url):
     else:
     
         return None
+    
+# scrape_pdf(BASE_URL)
