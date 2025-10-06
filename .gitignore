@@ -11,3 +11,4 @@ main_dataframe/*
 !.gitkeep
 __pycache__/
 paths.py
+.env

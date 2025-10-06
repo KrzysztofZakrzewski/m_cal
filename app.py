@@ -19,16 +19,27 @@ from getpass import getpass
 from IPython.display import Image, display, FileLink,IFrame
 import instructor
 from pydantic import BaseModel
+from dotenv import load_dotenv
 from openai import OpenAI
 
 import pdfplumber
 import streamlit as st
+load_dotenv()
+
+if "OPENAI_API_KEY" not in os.environ:
+    st.error("Nie znaleziono klucza API OpenAI.")
+    st.stop()
+
+def get_openai_client():
+    return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 
 
 ###################
 ### MAKE DISR
 from dirs import DIRS
+from utils import change_receipt_for_binary
+from receipt_processing import loading_data_from_receipt_into_json
 # from paths import PATHS
 
 ##############
@@ -50,15 +61,23 @@ main_dataframe_PATH = Path("main_dataframe")
 json_calories_table_PATH = Path('json_calories_table')
 
 # Receipt
+# if 'img_receipt_PATH' not in st.session_state:
+#     st.session_state['img_receipt_PATH'] = None
+img_receipt_PATH = Path("./receipt")
 temporary_json_from_receipt_PATH = Path('temporary_json_from_receipt')
 temporary_json_parsed_PATH = Path('temporary_json_parsed')
 
 
+# Session State Dynamic path
+if 'user_receipt' not in st.session_state:
+    st.session_state['user_receipt'] = None
 
-# url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
 
-# parsed_url = urlparse(url)
-# filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
+
+url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
+
+parsed_url = urlparse(url)
+filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
 
 # LOGS_FILE = DIRS["logs"] / "logs.log"
 LOGS_PATH = Path("logs")
@@ -75,7 +94,8 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf'
 
-
+#######
+##Functions
 
 def scrape_pdf(url):
     try:
@@ -118,4 +138,126 @@ def scrape_pdf(url):
     
         return None
     
+
+# # Converting receipt img to bytes
+
+# def change_receipt_for_binary(receipt_path):
+#     with open(receipt_path, "rb") as f:
+#         receipt_data = base64.b64encode(f.read()).decode('utf-8')
+
+#     return f"data:image/jpg;base64,{receipt_data}"
+    
 # scrape_pdf(BASE_URL)
+
+st.title("Dodawanie zdjęć")
+if 'img_receipt_PATH' not in st.session_state:
+    st.session_state['img_receipt_PATH'] = None
+# IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+
+# Field for uploading a photo
+uploaded_file = st.file_uploader("Wybierz zdjęcie", type=["png", "jpg", "jpeg"])
+
+if uploaded_file is not None:
+    # Delete all old files in the folder
+    for old_file in img_receipt_PATH.iterdir():
+        if old_file.is_file():
+            old_file.unlink()
+
+    # Saving a photo to a directory
+        if 'user_receipt' not in st.session_state:
+            st.session_state['user_receipt'] = None
+
+    save_path = img_receipt_PATH / "user_receipt.jpg"
+    with open(save_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    st.session_state['user_receipt'] = save_path
+    
+    st.success(f"wybrano zdjęcie: {uploaded_file.name}")
+    st.image(save_path, caption=uploaded_file.name, width=150)
+    # st.image(save_path, caption="Twoje zdjęcie", use_container_width=True)
+
+    # prepared_receipt = prepare_receipt_for_openai(user_receipt)
+    # st.json(prepared_receipt)
+    if st.button("Proceduj"):
+        if 'user_receipt' in st.session_state and st.session_state['user_receipt']:
+            
+            st.session_state['prepared_receipt'] = change_receipt_for_binary(st.session_state['user_receipt'])
+            st.success("Obraz przetworzony na bajty i zapisany w session_state")
+            loading_data_from_receipt_into_json(st.session_state['prepared_receipt'])
+            # st.json(prepared_receipt) 
+        else:
+            st.warning("Najpierw wgraj zdjęcie!")
+
+# def loading_data_from_receipt_into_json():
+    
+#     response = get_openai_client().chat.completions.create(
+#         # model="gpt-4o",
+#         model="gpt-4o-mini",
+#         temperature=0,
+#         messages=[
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {
+#                         "type": "text",
+#                         "text": """
+#     Wyciągnij informacje zawarte na paragonie z Restauracji w McDonald's w Polsce.
+#     Dane przedstaw w formacie JSON.
+#     Oczekuję informacji dotyczących nazw produtków, ilości, kwoty za poszczególne produkty oraz łącznej kwoty za cały paragon.
+#     Niektóre produkty w systemie fiskalnym mogą mieć niekonwencjonalne nazwy.
+#     Pod napisem "PARAGON FISKALNY" znajdują się produkty jeden pod drugim.
+#     Od lewej jest jego nazwa, po prawej ilość i należność.
+#     „Jeśli w nazwie produktu występuje liczba (np. Tenders 3, Tenders 5), traktuj ją jako część nazwy np: "Nuggets 6", "Tenders 3", etc. traktuj je jako 1 produkt.
+#     Dodatkowo potrzebuję informacji o:
+#     - dacie: rok, misiąć i dzień oraz godzinę zakupu.
+#     - Miejscu zakupu: miasto, ulica.
+#     Usuń z wszystkich kluczy i wartości dokładnie te znaki: kropkę (.), gwiazdkę (*), podłogę (_).
+#     Jeżeli podłoga (_) jest między literami zastą spacją ( )
+#     Nie zostawiaj żadnego z nich.
+#     Przykładowa struktura (na paragonie będą się znajdować różne produkty to przykład):
+#     {
+#     {
+#     "lody w wafelku z polewą karmelową": {
+#         "ilość": ...,
+#         "kwota": ...
+#     },
+#     "cheeseburger": {
+#         "ilość": ...,
+#         "kwota": ...
+#     },
+#     "lody w kubku z polewą truskawkową": {
+#         "ilość": ...,
+#         "kwota": ...
+#     },
+#     "Big Mac": {
+#         "ilość": ...,
+#         "kwota": ...
+#     },
+#     "łączna kwota za paragon": ...,
+#     "data": "yyyy-mm-dd",
+#     "godzina": "hh:mm",
+#     "miasto": "...",
+#     "ulica": "..."
+#     }
+
+#     tylko dane jako JSON, bez żadnych komentarzy
+#     """
+#                     },
+#                     {
+#                         "type": "image_url",
+#                         "image_url": {
+#                             "url": st.session_state['prepared_receipt'],
+#                             "detail": "high"
+#                         },
+#                     },
+#                 ],
+#             }
+#         ],
+#     )
+
+#         # saving the calorie table as json
+#         # temporary_json_from_receipt_PATH
+#     json_from_receipt = response.choices[0].message.content.replace('```json','').replace('```','').strip()
+#     with open(temporary_json_from_receipt_PATH/f'receipt_raw.json', 'w') as f:
+#             f.write(json_from_receipt)
+
