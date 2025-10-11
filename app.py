@@ -38,7 +38,8 @@ def get_openai_client():
 ###################
 ### MAKE DISR
 from dirs import DIRS
-from utils import change_receipt_for_binary
+from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_user_df_to_main_df
+from utils import change_receipt_for_binary, reading_calories_table
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
 # from paths import PATHS
 
@@ -72,6 +73,28 @@ temporary_json_parsed_PATH = Path('temporary_json_parsed')
 if 'user_receipt' not in st.session_state:
     st.session_state['user_receipt'] = None
 
+st.title("Dodawanie zdjęć")
+if 'img_receipt_PATH' not in st.session_state:
+    st.session_state['img_receipt_PATH'] = None
+
+if "path_for_calories_table" not in st.session_state:
+    st.session_state["path_for_calories_table"] = None
+
+if "calories" not in st.session_state:
+    st.session_state["calories"] = None
+
+if "path_for_receipt_parsed" not in st.session_state:
+    st.session_state["path_for_receipt_parsed"] = None
+
+if "main_df" not in st.session_state:
+    # st.session_state["main_df"] = None
+    st.session_state["main_df"] = create_main_df()
+
+if "df" not in st.session_state:
+    st.session_state["df"] = None
+
+# st.dataframe(st.session_state["main_df"])
+
 
 
 url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
@@ -79,7 +102,6 @@ url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-202
 parsed_url = urlparse(url)
 filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
 
-# LOGS_FILE = DIRS["logs"] / "logs.log"
 LOGS_PATH = Path("logs")
 LOGS_FILE = LOGS_PATH / 'logs.log'
 
@@ -137,22 +159,7 @@ def scrape_pdf(url):
     else:
     
         return None
-    
 
-# # Converting receipt img to bytes
-
-# def change_receipt_for_binary(receipt_path):
-#     with open(receipt_path, "rb") as f:
-#         receipt_data = base64.b64encode(f.read()).decode('utf-8')
-
-#     return f"data:image/jpg;base64,{receipt_data}"
-    
-# scrape_pdf(BASE_URL)
-
-st.title("Dodawanie zdjęć")
-if 'img_receipt_PATH' not in st.session_state:
-    st.session_state['img_receipt_PATH'] = None
-# IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Field for uploading a photo
 uploaded_file = st.file_uploader("Wybierz zdjęcie", type=["png", "jpg", "jpeg"])
@@ -183,8 +190,21 @@ if uploaded_file is not None:
             
             st.session_state['prepared_receipt'] = change_receipt_for_binary(st.session_state['user_receipt'])
             st.success("Obraz przetworzony na bajty i zapisany w session_state")
+            # Loading data from recitp
             loading_data_from_receipt_into_json(st.session_state['prepared_receipt'])
+
+            # Parsing to proper json base
             parsing_data_from_receipt_raw_into_json()
-            # st.json(prepared_receipt) 
+
+            # Reading calories table
+            st.session_state["path_for_calories_table"] = DIRS['json_calories_table']/'calories_table_352978-tabela-wo-8-11-2023-mop.json'
+            st.session_state["calories"] = reading_calories_table(st.session_state["path_for_calories_table"])
+
+            # Add data to dataframe
+            st.session_state["path_for_receipt_parsed"] = DIRS["temporary_json_parsed"] / "receipt_parsed.json"
+            st.session_state["df"] = receipt_of_user_to_dataframe(st.session_state['path_for_receipt_parsed'], st.session_state["calories"])
+            st.session_state["main_df"] = append_user_df_to_main_df( st.session_state["main_df"], st.session_state["df"])
+            st.dataframe(st.session_state["main_df"])
+
         else:
             st.warning("Najpierw wgraj zdjęcie!")
