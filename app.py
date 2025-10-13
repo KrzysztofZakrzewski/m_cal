@@ -11,6 +11,8 @@ import time
 import random
 import logging
 import os
+import io
+from io import StringIO
 from urllib.parse import urlparse
 
 import base64
@@ -93,6 +95,19 @@ if "main_df" not in st.session_state:
 if "df" not in st.session_state:
     st.session_state["df"] = None
 
+# name of csv uploded by user
+if "name_of_uloded_df" not in st.session_state:
+    st.session_state["name_of_uloded_df"] = None
+
+# user_main_df_name
+if "user_main_df_name" not in st.session_state:
+    st.session_state["user_main_df_name"] = None
+
+# Wyświetlaj ramkę danych POZA blokiem przycisku
+if "data_ready" not in st.session_state:
+    st.session_state["data_ready"] = False
+
+
 # st.dataframe(st.session_state["main_df"])
 
 
@@ -161,9 +176,53 @@ def scrape_pdf(url):
         return None
 
 
-# Field for uploading a photo
-uploaded_file = st.file_uploader("Wybierz zdjęcie", type=["png", "jpg", "jpeg"])
+####################
+### LOAD data frame
 
+uploaded_file = st.file_uploader("⬇️ Wybierz plik CSV, jeśli już posiadasz", type=["csv"])
+
+
+if uploaded_file is not None:
+    # 1️⃣ Wczytanie CSV do DataFrame bezpośrednio do session_state
+    st.session_state["main_df"] = pd.read_csv(StringIO(uploaded_file.getvalue().decode("utf-8")))
+
+    # 2️⃣ Zachowanie nazwy pliku
+    base_name = Path(uploaded_file.name).stem
+    st.session_state["user_main_df_name"] = base_name
+
+    # 3️⃣ Konwersja kolumn na odpowiednie typy
+    df = st.session_state["main_df"]
+
+    df["produkt"] = df["produkt"].astype("string")
+    df["ilość"] = df["ilość"].astype("Int64")
+    df["kcal_na_szt"] = df["kcal_na_szt"].astype("Int64")
+    df["kcal_razem"] = df["kcal_razem"].astype("Int64")
+    df["cena_na_szt"] = df["cena_na_szt"].astype("float")
+    df["cena_razem"] = df["cena_razem"].astype("float")
+    df["łączna kwota za paragon"] = df["łączna kwota za paragon"].astype("float")
+    df["miasto"] = df["miasto"].astype("string")
+    df["ulica"] = df["ulica"].astype("string")
+
+    if "data" in df.columns:
+        df["data"] = pd.to_datetime(df["data"], errors="coerce")
+
+    # 4️⃣ Przypisanie z powrotem do session_state
+    st.session_state["main_df"] = df
+
+    st.success(f"✅ Wczytano plik {base_name} i przypisano odpowiednie typy kolumn")
+# else:
+    # st.info("⬆️ Wgraj swój poprzedni plik CSV jesli posiadasz, aby dodać do niego nowe dane")
+
+
+##################
+#### Field for uploading a photo
+uploaded_file = st.file_uploader("Wybierz zdjęcie paragonu aby dodać nowe dane", type=["png", "jpg", "jpeg"])
+
+
+
+
+#################
+#### PROCESING
 if uploaded_file is not None:
     # Delete all old files in the folder
     for old_file in img_receipt_PATH.iterdir():
@@ -189,7 +248,7 @@ if uploaded_file is not None:
         if 'user_receipt' in st.session_state and st.session_state['user_receipt']:
             
             st.session_state['prepared_receipt'] = change_receipt_for_binary(st.session_state['user_receipt'])
-            st.success("Obraz przetworzony na bajty i zapisany w session_state")
+            # st.info("Przetwarzam obraz")
             # Loading data from recitp
             loading_data_from_receipt_into_json(st.session_state['prepared_receipt'])
 
@@ -203,8 +262,47 @@ if uploaded_file is not None:
             # Add data to dataframe
             st.session_state["path_for_receipt_parsed"] = DIRS["temporary_json_parsed"] / "receipt_parsed.json"
             st.session_state["df"] = receipt_of_user_to_dataframe(st.session_state['path_for_receipt_parsed'], st.session_state["calories"])
-            st.session_state["main_df"] = append_user_df_to_main_df( st.session_state["main_df"], st.session_state["df"])
-            st.dataframe(st.session_state["main_df"])
+            st.success("Obraz przetworzony")
+
+            st.session_state["data_ready"] = True
 
         else:
             st.warning("Najpierw wgraj zdjęcie!")
+
+# If the receipt details are ready, show them
+
+###############
+### Add dataframe from user do main_df
+if st.session_state.get("data_ready", False):
+    st.dataframe(st.session_state["df"])
+
+    if st.button("Dodaj do swojej bazy danych"):
+        st.session_state["main_df"] = append_user_df_to_main_df(
+            st.session_state["main_df"],
+            st.session_state["df"]
+        )
+        st.success("Dodano nowe dane")
+
+# Always show master database
+st.dataframe(st.session_state["main_df"])
+
+csv_to_save = st.session_state["main_df"]
+
+# Input to file name (only if user has not uploaded CSV)
+if uploaded_file is None:
+    st.session_state["user_main_df_name"] = st.text_input(
+        "Podaj nazwę dla swojego zestawu danych:",
+        value=st.session_state.get("user_main_df_name", "moja_baza")
+    )
+buffer = io.StringIO()
+csv_to_save.to_csv(buffer, index=False)
+csv_data = buffer.getvalue()
+
+# st.session_state["user_main_df_name"] = st.text_input("Podaj nazwę dla swojego zestawu danych:", value="moja_baza")
+
+st.download_button(
+    label="💾 Pobierz dane jako CSV",
+    data=csv_data,
+    file_name=f"{st.session_state['user_main_df_name']}.csv",
+    mime="text/csv"
+)
