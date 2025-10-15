@@ -14,6 +14,7 @@ import os
 import io
 from io import StringIO
 from urllib.parse import urlparse
+import matplotlib.pyplot as plt
 
 import base64
 from getpass import getpass
@@ -108,7 +109,8 @@ if "data_ready" not in st.session_state:
     st.session_state["data_ready"] = False
 
 
-# st.dataframe(st.session_state["main_df"])
+if "analyze_mode" not in st.session_state:
+    st.session_state["analyze_mode"] = False
 
 
 
@@ -218,9 +220,6 @@ if uploaded_file is not None:
 #### Field for uploading a photo
 uploaded_file = st.file_uploader("Wybierz zdjęcie paragonu aby dodać nowe dane", type=["png", "jpg", "jpeg"])
 
-
-
-
 #################
 #### PROCESING
 if uploaded_file is not None:
@@ -306,3 +305,139 @@ st.download_button(
     file_name=f"{st.session_state['user_main_df_name']}.csv",
     mime="text/csv"
 )
+
+# st.sidebar.header("🔍 Filtry")
+
+# Data
+
+DATA = st.session_state['main_df']
+
+# @st.cache_data
+# def get_maind_df():
+#     all_df=DATA
+#     return all_df
+
+##########
+### SIDEBAR SELECTOR
+filtered_df = DATA.copy()
+
+with st.sidebar:
+    st.header('🔍 Filtry')
+    # Products
+    product = st.sidebar.multiselect("Produkt", ["(Wszystkie)"] + list(DATA["produkt"].dropna().unique()))
+    if "(Wszystkie)" not in product and product:
+        filtered_df = DATA[filtered_df["produkt"].isin(product)]
+
+    # Mulitiple amount of one product
+    amount_of_products = st.multiselect('Ilość pojedyńczego produktu', ["(Wszystkie)"] + list(DATA["ilość"].dropna().unique()))
+    if "(Wszystkie)" not in amount_of_products and amount_of_products:
+        filtered_df = filtered_df[filtered_df["ilość"].isin(amount_of_products)]
+
+    # Kalories of one product
+    single_kalc = st.sidebar.multiselect('Pojedyńcze kaloriw', ["(Wszystkie)"] + list(DATA["kcal_na_szt"].dropna().unique()))
+    if "(Wszystkie)" not in single_kalc and single_kalc:
+        filtered_df = filtered_df[filtered_df["kcal_na_szt"].isin(single_kalc)]
+
+    # Kcal for one type of product per receipt
+    kcal_for_one_type_of_product_per_receipt = st.sidebar.multiselect("Kalorie razem",["(Wszystkie)"] + list(DATA["kcal_razem"].dropna().unique()))
+    if "(Wszystkie)" not in kcal_for_one_type_of_product_per_receipt and kcal_for_one_type_of_product_per_receipt:
+        filtered_df = filtered_df[filtered_df["kcal_razem"].isin(kcal_for_one_type_of_product_per_receipt)]
+
+    # Price for one product
+    price_for_pice = st.sidebar.multiselect("Cena za sztukę",["(Wszystkie)"] + list(DATA["cena_na_szt"].dropna().unique()))
+    if "(Wszystkie)" not in price_for_pice and price_for_pice:
+        filtered_df = filtered_df[filtered_df["cena_na_szt"].isin(price_for_pice)]
+
+    # # Total price for this same products
+    total_price_for_this_same_products_in_one_recepit = filtered_df["cena_razem"].dropna()
+
+    if not total_price_for_this_same_products_in_one_recepit.empty:
+        min_kwota = float(total_price_for_this_same_products_in_one_recepit.min())
+        max_kwota = float(total_price_for_this_same_products_in_one_recepit.max())
+
+        if min_kwota == max_kwota:
+            selected_range = (min_kwota, max_kwota)
+        else:
+            selected_range = st.slider(
+                "Zakres cen za te same produkty na jednym paragonie",
+                min_value=round(min_kwota, 2),
+                max_value=round(max_kwota, 2),
+                value=(round(min_kwota, 2), round(max_kwota, 2)),
+                step=0.5,
+            )
+        filtered_df = filtered_df[
+            (filtered_df["cena_razem"] >= selected_range[0]) &
+            (filtered_df["cena_razem"] <= selected_range[1])
+        ]
+    else:
+        st.warning("Brak danych w kolumnie 'cena_razem'.")
+
+
+    # Total amount for receipt
+    total_amount_for_receipt = DATA["łączna kwota za paragon"].dropna()
+
+    if not total_amount_for_receipt.empty:
+        min_kwota = float(total_amount_for_receipt.min())
+        max_kwota = float(total_amount_for_receipt.max())
+
+        if min_kwota < max_kwota:
+            selected_range = st.slider(
+                "Zakres łącznej kwoty za paragon (zł)",
+                min_value=round(min_kwota, 2),
+                max_value=round(max_kwota, 2),
+                value=(round(min_kwota, 2), round(max_kwota, 2)),
+                step=0.5,
+            )
+        else:
+            st.write(f"📊 Wszystkie paragony mają tę samą kwotę: {min_kwota} zł")
+            selected_range = (min_kwota, max_kwota)
+
+    else:
+        st.warning("Brak danych w kolumnie 'łączna kwota za paragon'.")
+
+    # City
+    city = st.sidebar.multiselect('Miasto', ["(Wszystkie)"] + list(DATA["miasto"].dropna().unique()))
+    if "(Wszystkie)" not in city and city:
+        filtered_df = filtered_df[filtered_df["miasto"].isin(city)]
+
+    # Street
+    stret = st.sidebar.multiselect('Ulica', DATA['ulica'].unique())
+    if "(Wszystkie)" not in stret and stret:
+        filtered_df = filtered_df[filtered_df["ulica"].isin(stret)]
+
+    # Date
+    st.header("📅 Zakres dat")
+    date = DATA["data"].dropna()
+
+    if not date.empty:
+        # convert to datetime (just in case)
+        date = pd.to_datetime(date)
+
+        min_data = date.min().date()
+        max_data = date.max().date()
+
+        selected_date_range = st.date_input(
+            "Wybierz zakres dat",
+            value=(min_data, max_data),
+            min_value=min_data,
+            max_value=max_data,
+            format="YYYY-MM-DD"
+        )
+
+        if isinstance(selected_date_range, tuple) and len(selected_date_range) == 2:
+            start_date, end_date = selected_date_range
+            filtered_df = filtered_df[
+                (filtered_df["data"].dt.date >= start_date) &
+                (filtered_df["data"].dt.date <= end_date)
+            ]
+            st.write(f"📊 Wybrany zakres: **{start_date} – {end_date}**")
+        else:
+            st.warning("Wybierz poprawny zakres dat (od – do).")
+    else:
+        st.warning("Brak danych w kolumnie 'data'.")
+
+
+# --- Display after filters ---
+st.markdown("### 📊 Wyniki filtrowania po produkcie")
+st.dataframe(filtered_df, use_container_width=True)
+st.write(f"🔹 Liczba rekordów: {len(filtered_df)}")
