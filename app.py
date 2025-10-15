@@ -352,17 +352,17 @@ with st.sidebar:
     total_price_for_this_same_products_in_one_recepit = filtered_df["cena_razem"].dropna()
 
     if not total_price_for_this_same_products_in_one_recepit.empty:
-        min_kwota = float(total_price_for_this_same_products_in_one_recepit.min())
-        max_kwota = float(total_price_for_this_same_products_in_one_recepit.max())
+        min_price = float(total_price_for_this_same_products_in_one_recepit.min())
+        max_price = float(total_price_for_this_same_products_in_one_recepit.max())
 
-        if min_kwota == max_kwota:
-            selected_range = (min_kwota, max_kwota)
+        if min_price == max_price:
+            selected_range = (min_price, max_price)
         else:
             selected_range = st.slider(
                 "Zakres cen za te same produkty na jednym paragonie",
-                min_value=round(min_kwota, 2),
-                max_value=round(max_kwota, 2),
-                value=(round(min_kwota, 2), round(max_kwota, 2)),
+                min_value=round(min_price, 2),
+                max_value=round(max_price, 2),
+                value=(round(min_price, 2), round(max_price, 2)),
                 step=0.5,
             )
         filtered_df = filtered_df[
@@ -374,23 +374,28 @@ with st.sidebar:
 
 
     # Total amount for receipt
-    total_amount_for_receipt = DATA["łączna kwota za paragon"].dropna()
+    total_amount_for_receipt = filtered_df["łączna kwota za paragon"].dropna()
 
     if not total_amount_for_receipt.empty:
-        min_kwota = float(total_amount_for_receipt.min())
-        max_kwota = float(total_amount_for_receipt.max())
+        min_amount = float(total_amount_for_receipt.min())
+        max_amount = float(total_amount_for_receipt.max())
 
-        if min_kwota < max_kwota:
+        if min_amount < max_amount:
             selected_range = st.slider(
                 "Zakres łącznej kwoty za paragon (zł)",
-                min_value=round(min_kwota, 2),
-                max_value=round(max_kwota, 2),
-                value=(round(min_kwota, 2), round(max_kwota, 2)),
+                min_value=round(min_amount, 2),
+                max_value=round(max_amount, 2),
+                value=(round(min_amount, 2), round(max_amount, 2)),
                 step=0.5,
             )
         else:
-            st.write(f"📊 Wszystkie paragony mają tę samą kwotę: {min_kwota} zł")
-            selected_range = (min_kwota, max_kwota)
+            st.write(f"📊 Wszystkie paragony mają tę samą kwotę: {min_amount} zł")
+            selected_range = (min_amount, max_amount)
+
+        filtered_df = filtered_df[
+            (filtered_df["łączna kwota za paragon"] >= selected_range[0]) &
+            (filtered_df["łączna kwota za paragon"] <= selected_range[1])
+            ]
 
     else:
         st.warning("Brak danych w kolumnie 'łączna kwota za paragon'.")
