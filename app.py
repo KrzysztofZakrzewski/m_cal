@@ -45,6 +45,7 @@ from dirs import DIRS
 from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_user_df_to_main_df
 from utils import change_receipt_for_binary, reading_calories_table
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
+from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
 # from paths import PATHS
 
 ##############
@@ -452,85 +453,27 @@ st.markdown("### 📊 Wyniki filtrowania po produkcie")
 st.dataframe(filtered_df, use_container_width=True)
 st.write(f"🔹 Liczba rekordów: {len(filtered_df)}")
 
+# Dataframe for chars
 bars_df = filtered_df
 
-st.markdown("<h2>Podsumowanie kalori</h2>", unsafe_allow_html=True)
+st.markdown("<h2>🍗Podsumowanie kalori</h2>", unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["Produkty", "Mieiące", "Miasta"])
 
 with tab1:
-    if not bars_df.empty:
-        fig_kalc = px.histogram(
-            bars_df,
-            x="produkt",             # nazwa kolumny na osi X
-            y="kcal_razem",          # (opcjonalnie) co ma być na osi Y
-            title="Rozkład kalorii na produkt",
-            color="miasto",          # (opcjonalnie) grupowanie kolorami
-            nbins=10,                # liczba przedziałów histogramu
-            text_auto=True           # liczby nad słupkami
-        )
-
-        fig_kalc.update_layout(
-            title="📊 Kalorie w zależności od produktu w podanym zakresie",
-            xaxis_title="Produkt",
-            yaxis_title="Łączna liczba kcal",
-            bargap=0.2
-        )
-
-        st.plotly_chart(fig_kalc, use_container_width=True, key="plot_kcal")
-    else:
-        st.warning("Brak danych do wyświetlenia na wykresie.")
-
+    calorie_distribution_per_product_chart(bars_df)
 with tab2:
-    if not bars_df.empty and "data" in bars_df.columns:
-        # Upewniamy się, że kolumna 'data' ma odpowiedni format
-        bars_df["data"] = pd.to_datetime(bars_df["data"], errors="coerce")
+    total_calories_consumed_each_month_chart(bars_df)
 
-        # Tworzymy kolumnę z miesiącem (np. 2025-10)
-        bars_df["miesiąc"] = bars_df["data"].dt.to_period("M").astype(str)
 
-        # Grupujemy po miesiącu i sumujemy kalorie
-        monthly_kcal = bars_df.groupby("miesiąc", as_index=False)["kcal_razem"].sum()
+st.markdown("<h2>💰Podsumowanie finansów</h2>", unsafe_allow_html=True)
 
-        # Tworzymy wykres
-        fig_monthly = px.bar(
-            monthly_kcal,
-            x="miesiąc",
-            y="kcal_razem",
-            title="📅 Suma kalorii spożytych w każdym miesiącu",
-            text_auto=True
-        )
+tab4, tab5, tab6 = st.tabs(["Produkty", "Mieiące", "Miasta"])
+with tab4:
+    distribution_of_money_spent_per_product_chart(bars_df)
+with tab5:
+    total_money_spend_each_month_chart(bars_df)
 
-        fig_monthly.update_layout(
-            xaxis_title="Miesiąc",
-            yaxis_title="Łączna liczba kcal",
-            bargap=0.2
-        )
 
-        st.plotly_chart(fig_monthly, use_container_width=True, key="plot_monthly_kcal")
-
-    else:
-        st.warning("Brak danych z kolumną 'data' do stworzenia wykresu miesięcznego.")
-
-if not bars_df.empty:
-    fig_price = px.histogram(
-        bars_df,
-        x="produkt",             # nazwa kolumny na osi X
-        y="cena_razem",          # (opcjonalnie) co ma być na osi Y
-        title="Rozkład kalorii na produkt",
-        color="miasto",          # (opcjonalnie) grupowanie kolorami
-        nbins=10,                # liczba przedziałów histogramu
-        text_auto=True           # liczby nad słupkami
-    )
-
-    fig_price.update_layout(
-        title="💸 Pieniądze wydane na poszczególne produkty produktów",
-        xaxis_title="Produkt",
-        yaxis_title="Łączna wydana kwota",
-        bargap=0.2
-    )
-
-    st.plotly_chart(fig_price, use_container_width=True, key="plot_price")
-else:
-    st.warning("Brak danych do wyświetlenia na wykresie.")
+    
 
