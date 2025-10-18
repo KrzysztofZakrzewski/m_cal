@@ -9,6 +9,7 @@ from datetime import datetime
 import re
 import time
 import random
+import plotly.express as px
 import logging
 import os
 import io
@@ -102,11 +103,14 @@ if "name_of_uloded_df" not in st.session_state:
 
 # user_main_df_name
 if "user_main_df_name" not in st.session_state:
-    st.session_state["user_main_df_name"] = None
+    st.session_state["user_main_df_name"] = "moja_baza"
 
 # Wyświetlaj ramkę danych POZA blokiem przycisku
 if "data_ready" not in st.session_state:
     st.session_state["data_ready"] = False
+
+if 'uploaded_file_for_csv' not in st.session_state:
+    st.session_state['uploaded_file_for_csv'] = None
 
 
 if "analyze_mode" not in st.session_state:
@@ -181,15 +185,15 @@ def scrape_pdf(url):
 ####################
 ### LOAD data frame
 
-uploaded_file = st.file_uploader("⬇️ Wybierz plik CSV, jeśli już posiadasz", type=["csv"])
+st.session_state['uploaded_file_for_csv'] = st.file_uploader("⬇️ Wybierz plik CSV, jeśli już posiadasz", type=["csv"])
 
 
-if uploaded_file is not None:
+if st.session_state['uploaded_file_for_csv'] is not None:
     # 1️⃣ Wczytanie CSV do DataFrame bezpośrednio do session_state
-    st.session_state["main_df"] = pd.read_csv(StringIO(uploaded_file.getvalue().decode("utf-8")))
+    st.session_state["main_df"] = pd.read_csv(StringIO(st.session_state['uploaded_file_for_csv'].getvalue().decode("utf-8")))
 
     # 2️⃣ Zachowanie nazwy pliku
-    base_name = Path(uploaded_file.name).stem
+    base_name = Path(st.session_state['uploaded_file_for_csv'].name).stem
     st.session_state["user_main_df_name"] = base_name
 
     # 3️⃣ Konwersja kolumn na odpowiednie typy
@@ -288,10 +292,11 @@ st.dataframe(st.session_state["main_df"])
 csv_to_save = st.session_state["main_df"]
 
 # Input to file name (only if user has not uploaded CSV)
-if uploaded_file is None:
+if st.session_state['uploaded_file_for_csv']:
     st.session_state["user_main_df_name"] = st.text_input(
         "Podaj nazwę dla swojego zestawu danych:",
-        value=st.session_state.get("user_main_df_name", "moja_baza")
+        value=st.session_state["user_main_df_name"]
+        # key="user_main_df_name_input"
     )
 buffer = io.StringIO()
 csv_to_save.to_csv(buffer, index=False)
@@ -446,3 +451,86 @@ with st.sidebar:
 st.markdown("### 📊 Wyniki filtrowania po produkcie")
 st.dataframe(filtered_df, use_container_width=True)
 st.write(f"🔹 Liczba rekordów: {len(filtered_df)}")
+
+bars_df = filtered_df
+
+st.markdown("<h2>Podsumowanie kalori</h2>", unsafe_allow_html=True)
+
+tab1, tab2, tab3 = st.tabs(["Produkty", "Mieiące", "Miasta"])
+
+with tab1:
+    if not bars_df.empty:
+        fig_kalc = px.histogram(
+            bars_df,
+            x="produkt",             # nazwa kolumny na osi X
+            y="kcal_razem",          # (opcjonalnie) co ma być na osi Y
+            title="Rozkład kalorii na produkt",
+            color="miasto",          # (opcjonalnie) grupowanie kolorami
+            nbins=10,                # liczba przedziałów histogramu
+            text_auto=True           # liczby nad słupkami
+        )
+
+        fig_kalc.update_layout(
+            title="📊 Kalorie w zależności od produktu w podanym zakresie",
+            xaxis_title="Produkt",
+            yaxis_title="Łączna liczba kcal",
+            bargap=0.2
+        )
+
+        st.plotly_chart(fig_kalc, use_container_width=True, key="plot_kcal")
+    else:
+        st.warning("Brak danych do wyświetlenia na wykresie.")
+
+with tab2:
+    if not bars_df.empty and "data" in bars_df.columns:
+        # Upewniamy się, że kolumna 'data' ma odpowiedni format
+        bars_df["data"] = pd.to_datetime(bars_df["data"], errors="coerce")
+
+        # Tworzymy kolumnę z miesiącem (np. 2025-10)
+        bars_df["miesiąc"] = bars_df["data"].dt.to_period("M").astype(str)
+
+        # Grupujemy po miesiącu i sumujemy kalorie
+        monthly_kcal = bars_df.groupby("miesiąc", as_index=False)["kcal_razem"].sum()
+
+        # Tworzymy wykres
+        fig_monthly = px.bar(
+            monthly_kcal,
+            x="miesiąc",
+            y="kcal_razem",
+            title="📅 Suma kalorii spożytych w każdym miesiącu",
+            text_auto=True
+        )
+
+        fig_monthly.update_layout(
+            xaxis_title="Miesiąc",
+            yaxis_title="Łączna liczba kcal",
+            bargap=0.2
+        )
+
+        st.plotly_chart(fig_monthly, use_container_width=True, key="plot_monthly_kcal")
+
+    else:
+        st.warning("Brak danych z kolumną 'data' do stworzenia wykresu miesięcznego.")
+
+if not bars_df.empty:
+    fig_price = px.histogram(
+        bars_df,
+        x="produkt",             # nazwa kolumny na osi X
+        y="cena_razem",          # (opcjonalnie) co ma być na osi Y
+        title="Rozkład kalorii na produkt",
+        color="miasto",          # (opcjonalnie) grupowanie kolorami
+        nbins=10,                # liczba przedziałów histogramu
+        text_auto=True           # liczby nad słupkami
+    )
+
+    fig_price.update_layout(
+        title="💸 Pieniądze wydane na poszczególne produkty produktów",
+        xaxis_title="Produkt",
+        yaxis_title="Łączna wydana kwota",
+        bargap=0.2
+    )
+
+    st.plotly_chart(fig_price, use_container_width=True, key="plot_price")
+else:
+    st.warning("Brak danych do wyświetlenia na wykresie.")
+
