@@ -14,7 +14,7 @@ import logging
 import os
 import io
 from io import StringIO
-from urllib.parse import urlparse
+from urllib.parse import urlparse # scraper
 import matplotlib.pyplot as plt
 
 import base64
@@ -55,6 +55,7 @@ def get_openai_client():
 # - receipt_processing: OCR and JSON parsing of receipts
 # - chars: visualization utilities (Plotly charts
 from dirs import DIRS
+from scaper import scrape_pdf
 from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_user_df_to_main_df
 from utils import change_receipt_for_binary, reading_calories_table
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
@@ -134,7 +135,7 @@ if "analyze_mode" not in st.session_state:
 url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
 
 parsed_url = urlparse(url)
-filename = os.path.basename(parsed_url.path)  # wyciągnie "352978-tabela-wo-8-11-2023-mop.pdf"
+filename = os.path.basename(parsed_url.path)  # take the name "352978-tabela-wo-8-11-2023-mop.pdf"
 
 LOGS_PATH = Path("logs")
 LOGS_FILE = LOGS_PATH / 'logs.log'
@@ -152,47 +153,50 @@ BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-1
 
 #######
 ##Functions
-
-def scrape_pdf(url):
-    try:
-        url = BASE_URL
-        response = requests.get(
-            url,
-            # params=params,
-            headers={"version":"2"},
-
-            #timeout for 5 sek
-            timeout=5
-        )
+if st.button('Pobierz pdf'):
+    scrape_pdf(url)
 
 
-        response.raise_for_status()
+# def scrape_pdf(url):
+#     try:
+#         url = BASE_URL
+#         response = requests.get(
+#             url,
+#             # params=params,
+#             headers={"version":"2"},
 
-        # timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        pdf_name=filename
+#             #timeout for 5 sek
+#             timeout=5
+#         )
 
-        with open(raw_pdf_PATH/pdf_name, 'wb') as f:
-            f.write(response.content)
-        logger.info(f'💚 udało się pobrać plik pfd {pdf_name}')
-    except HTTPError as e:
-        if 400 <= response.status_code < 500:
-            logger.error(f'❌Błąd klienta {response.status_code}:{response.reason} dla strony..')
-            return
-        elif 500 <= response.status_code < 600:
-            logger.warning(f'⚠️Błąd serwera {response.status_code}:{response.reason}')
-        else:
-            reason = getattr(response, 'reason', "brak opisu")
-            logger.error(f'❌ Inny błąt HTTP {response.status_code}:{reason}')
 
-    except (ConnectionAbortedError, Timeout) as e:
-        logger.warning(f'🌐 Problem z połączeniem/timeout na stronie: {e}')
+#         response.raise_for_status()
+
+#         # timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+#         pdf_name=filename
+
+#         with open(raw_pdf_PATH/pdf_name, 'wb') as f:
+#             f.write(response.content)
+#         logger.info(f'💚 udało się pobrać plik pfd {pdf_name}')
+#     except HTTPError as e:
+#         if 400 <= response.status_code < 500:
+#             logger.error(f'❌Błąd klienta {response.status_code}:{response.reason} dla strony..')
+#             return
+#         elif 500 <= response.status_code < 600:
+#             logger.warning(f'⚠️Błąd serwera {response.status_code}:{response.reason}')
+#         else:
+#             reason = getattr(response, 'reason', "brak opisu")
+#             logger.error(f'❌ Inny błąt HTTP {response.status_code}:{reason}')
+
+#     except (ConnectionAbortedError, Timeout) as e:
+#         logger.warning(f'🌐 Problem z połączeniem/timeout na stronie: {e}')
     
-    except OSError as e:
-        logger.error(f'❓ Niespodziewany wyjątek przy stronie, {e.__class__.__name__}: {e}')
+#     except OSError as e:
+#         logger.error(f'❓ Niespodziewany wyjątek przy stronie, {e.__class__.__name__}: {e}')
 
-    else:
+#     else:
     
-        return None
+#         return None
 
 # ===============================================================
 # 📦 LOAD data frame
