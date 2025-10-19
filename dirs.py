@@ -1,8 +1,17 @@
 # modules.py
 from pathlib import Path
 import os
+from typing import Dict
 
-def init_dirs():
+def init_dirs()-> Dict[str, Path]:
+    """
+    Initialize project directories relative to this file.
+
+    Creates necessary folders if they do not exist yet.
+
+    Returns:
+        dirs (Dict[str, Path]): A dictionary mapping folder names to their Path objects.
+    """
     BASE_DIR = Path(__file__).resolve().parent
     dirs = {
         # "test1": BASE_DIR / "test1",
