@@ -164,6 +164,7 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     "Kubek Karmel": "Lody o smaku waniliowym z polewą karmelową",
     "Wafel Karmel": "Lody o smaku waniliowym z polewą karmelową",
     "Jalapeno Burger": "Jalapeño Burger"
+    "Sos SlodkoKwasny": "Sos Słodko-Kwaśny"
 
     Zwróć poprawiony JSON.
     """

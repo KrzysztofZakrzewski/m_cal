@@ -60,6 +60,7 @@ from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_
 from utils import change_receipt_for_binary, reading_calories_table
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
 from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
+from pdf_parser import extracting_text_from_pdf, new_caloris_table_from_pdf_json, merge_json_files
 
 # ===============================================================
 # 📦 PATHS
@@ -70,9 +71,10 @@ LOGS_PATH = Path("logs")
 LOGS_FILE = LOGS_PATH / 'logs.log'
 
 # PDF
-raw_pdf_PATH = Path("./pdf")
-raw_pdf_PATH.mkdir(parents=True, exist_ok=True)
-pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'
+# raw_pdf_PATH = Path("./pdf")
+# raw_pdf_PATH.mkdir(parents=True, exist_ok=True)
+# pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'
+pdf_path_to_create_text = DIRS['pdf']/'352978-tabela-wo-8-11-2023-mop.pdf'
 
 # DataFrame
 main_dataframe_PATH = Path("main_dataframe")
@@ -153,8 +155,17 @@ BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-1
 
 #######
 ##Functions
+
+constant_cal_table = DIRS['pdf']/'offer_classic.json'
+temporary_cal_table = DIRS['pdf']/'offer_classic_temporary.json'
+
 if st.button('Pobierz pdf'):
     scrape_pdf(url)
+
+if st.button('Sparsuj PDF'):
+    text = extracting_text_from_pdf(pdf_path_to_create_text)
+    new_cal_table = new_caloris_table_from_pdf_json(text)
+
 
 
 # def scrape_pdf(url):
@@ -275,7 +286,7 @@ if uploaded_receipt_image is not None:
             parsing_data_from_receipt_raw_into_json()
 
             # Reading calories table
-            st.session_state["path_for_calories_table"] = DIRS['json_calories_table']/'calories_table_352978-tabela-wo-8-11-2023-mop.json'
+            st.session_state["path_for_calories_table"] = DIRS['json_calories_table']/'offer_classic.json'
             st.session_state["calories"] = reading_calories_table(st.session_state["path_for_calories_table"])
 
             # Add data to dataframe
