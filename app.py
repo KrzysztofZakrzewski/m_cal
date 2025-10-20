@@ -156,8 +156,8 @@ BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-1
 #######
 ##Functions
 
-constant_cal_table = DIRS['pdf']/'offer_classic.json'
-temporary_cal_table = DIRS['pdf']/'offer_classic_temporary.json'
+constant_cal_table = DIRS['json_calories_table']/'offer_classic.json'
+temporary_cal_table = DIRS['json_calories_table']/'offer_classic_temporary.json'
 
 if st.button('Pobierz pdf'):
     scrape_pdf(url)
@@ -165,7 +165,8 @@ if st.button('Pobierz pdf'):
 if st.button('Sparsuj PDF'):
     text = extracting_text_from_pdf(pdf_path_to_create_text)
     new_cal_table = new_caloris_table_from_pdf_json(text)
-
+    merge_json_files(constant_cal_table, temporary_cal_table)
+    
 
 
 # def scrape_pdf(url):
