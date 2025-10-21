@@ -41,7 +41,6 @@ if "OPENAI_API_KEY" not in os.environ:
 
 
 # Helper function to initialize and return an OpenAI client using the stored API key.
-
 def get_openai_client():
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -73,9 +72,6 @@ LOGS_PATH = Path("logs")
 LOGS_FILE = LOGS_PATH / 'logs.log'
 
 # PDF
-# raw_pdf_PATH = Path("./pdf")
-# raw_pdf_PATH.mkdir(parents=True, exist_ok=True)
-# pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'
 pdf_path_to_create_text = DIRS['pdf']/'352978-tabela-wo-8-11-2023-mop.pdf'
 
 # DataFrame
@@ -502,21 +498,10 @@ with tab5:
 # 💾 Dowland filtered data as CSV
 # ===============================================================
 
-# Pozwól użytkownikowi podać nazwę pliku
+# Name of the filtred file, defolt with "przefiltrowany"
 filtered_name = st.text_input("Podaj nazwę dla przefiltrowanego zestawu danych:", st.session_state["user_main_df_name"]+" przefiltrowany")
 
-# # Przygotuj CSV do pobrania
-# buffer = io.StringIO()
-# filtered_df.to_csv(buffer, index=False)
-# csv_data_filtered = buffer.getvalue()
-
-# # Przycisk do pobrania
-# st.download_button(
-#     label="⬇️ Pobierz przefiltrowane dane jako CSV",
-#     data=csv_data_filtered,
-#     file_name=f"{filtered_name}.csv",
-#     mime="text/csv",
-# )
+# Dowland to csv button
 download_csv_button(
     df=filtered_df,
     file_name=filtered_name,
@@ -527,6 +512,7 @@ download_csv_button(
 # 💾 Dowland filtered data as EXEL
 # ===============================================================
 
+# Dowland to exel button
 if st.button("💾 Zapisz przefiltorane dane jako Excel"):
     excel_data = to_excel(filtered_df)
     st.download_button(
