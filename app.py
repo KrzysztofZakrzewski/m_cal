@@ -13,9 +13,10 @@ import plotly.express as px
 import logging
 import os
 import io
-from io import StringIO
+from io import StringIO, BytesIO
 from urllib.parse import urlparse # scraper
 import matplotlib.pyplot as plt
+from openpyxl import Workbook
 
 import base64
 from getpass import getpass
@@ -61,6 +62,7 @@ from utils import change_receipt_for_binary, reading_calories_table
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
 from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
 from pdf_parser import extracting_text_from_pdf, new_caloris_table_from_pdf_json, merge_json_files
+from data_export import download_csv_button, to_excel
 
 # ===============================================================
 # 📦 PATHS
@@ -132,6 +134,9 @@ if 'uploaded_file_for_csv' not in st.session_state:
 if "url_input" not in st.session_state:
     st.session_state["url_input"] = None
 
+if "filtered_df" not in st.session_state:
+    st.session_state['"filtered_df"'] = None 
+
 # Hardcore the url adres for pdf
 url = "https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
 
@@ -168,49 +173,6 @@ if st.button('Sparsuj PDF'):
     text = extracting_text_from_pdf(pdf_path_to_create_text)
     new_cal_table = new_caloris_table_from_pdf_json(text)
     merge_json_files(constant_cal_table, temporary_cal_table)
-    
-
-
-# def scrape_pdf(url):
-#     try:
-#         url = BASE_URL
-#         response = requests.get(
-#             url,
-#             # params=params,
-#             headers={"version":"2"},
-
-#             #timeout for 5 sek
-#             timeout=5
-#         )
-
-
-#         response.raise_for_status()
-
-#         # timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-#         pdf_name=filename
-
-#         with open(raw_pdf_PATH/pdf_name, 'wb') as f:
-#             f.write(response.content)
-#         logger.info(f'💚 udało się pobrać plik pfd {pdf_name}')
-#     except HTTPError as e:
-#         if 400 <= response.status_code < 500:
-#             logger.error(f'❌Błąd klienta {response.status_code}:{response.reason} dla strony..')
-#             return
-#         elif 500 <= response.status_code < 600:
-#             logger.warning(f'⚠️Błąd serwera {response.status_code}:{response.reason}')
-#         else:
-#             reason = getattr(response, 'reason', "brak opisu")
-#             logger.error(f'❌ Inny błąt HTTP {response.status_code}:{reason}')
-
-#     except (ConnectionAbortedError, Timeout) as e:
-#         logger.warning(f'🌐 Problem z połączeniem/timeout na stronie: {e}')
-    
-#     except OSError as e:
-#         logger.error(f'❓ Niespodziewany wyjątek przy stronie, {e.__class__.__name__}: {e}')
-
-#     else:
-    
-#         return None
 
 # ===============================================================
 # 📦 LOAD data frame
@@ -319,32 +281,51 @@ if st.session_state.get("data_ready", False):
 st.text('')
 st.dataframe(st.session_state["main_df"], height=200)
 
-# Prepare the current DataFrame for CSV export:
-# 1. Retrieve the main DataFrame from Streamlit's session state.
-# 2. If the user has uploaded a CSV, display a text input to allow them
-#    to specify a name for their dataset, and overdrive the name it in session state.
-# 3. Convert the DataFrame to a CSV string in memory using io.StringIO,
-#    without including the index column, and store the CSV content in csv_data.
-csv_to_save = st.session_state["main_df"]
+# ===============================================================
+# 💾 Dowland as CSV
+# ===============================================================
 
-# Input to file name (only if user has not uploaded CSV)
-if st.session_state['uploaded_file_for_csv']:
-    st.session_state["user_main_df_name"] = st.text_input(
-        "Podaj nazwę dla swojego zestawu danych:",
-        value=st.session_state["user_main_df_name"]
-        # key="user_main_df_name_input"
-    )
-buffer = io.StringIO()
-csv_to_save.to_csv(buffer, index=False)
-csv_data = buffer.getvalue()
+# Prepare and export the current DataFrame as a CSV file:
+# 1. Display a text input that allows the user to specify or update the dataset name.
+#    The entered name is stored in Streamlit's session state under 'user_main_df_name'.
+# 2. Call the `download_csv_button` utility function to create a Streamlit download button.
+#    The function handles converting the DataFrame to CSV in memory and triggers file download
+#    using the provided dataset name as the file name.
 
-#Download dataframe with new data
-st.download_button(
-    label="💾 Pobierz dane jako CSV",
-    data=csv_data,
-    file_name=f"{st.session_state['user_main_df_name']}.csv",
-    mime="text/csv"
+# Input to file name
+st.session_state["user_main_df_name"] = st.text_input(
+    "Podaj nazwę dla swojego zestawu danych:",
+    value=st.session_state["user_main_df_name"])
+
+# Download dataframe with new data
+
+download_csv_button(
+    df=st.session_state["main_df"],
+    file_name=st.session_state["user_main_df_name"],
+    label="💾 Pobierz dane jako CSV"
 )
+
+# ===============================================================
+# 💾 Dowland as Exel
+# ===============================================================
+
+# Render a Streamlit download button for exporting a DataFrame as a CSV file:
+# - `df`: the DataFrame to export (here, the main DataFrame from session state).
+# - `file_name`: the name that will be suggested for the downloaded CSV file.
+# - `label`: the text shown on the Streamlit button.
+# 
+# When the user clicks the button, the DataFrame is converted to a CSV in memory
+# and offered for download without writing a file to disk.
+
+if st.button("💾 Zapisz jako Excel"):
+    excel_data = to_excel(st.session_state['main_df'])
+    st.download_button(
+        label="⬇️ Pobierz plik Excel",
+        data=excel_data,
+        file_name=st.session_state['user_main_df_name'],
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
 
 # ===============================================================
 # 🔍 FILTERS
@@ -516,3 +497,41 @@ with tab4:
     distribution_of_money_spent_per_product_chart(bars_df)
 with tab5:
     total_money_spend_each_month_chart(bars_df)
+
+# ===============================================================
+# 💾 Dowland filtered data as CSV
+# ===============================================================
+
+# Pozwól użytkownikowi podać nazwę pliku
+filtered_name = st.text_input("Podaj nazwę dla przefiltrowanego zestawu danych:", st.session_state["user_main_df_name"]+" przefiltrowany")
+
+# # Przygotuj CSV do pobrania
+# buffer = io.StringIO()
+# filtered_df.to_csv(buffer, index=False)
+# csv_data_filtered = buffer.getvalue()
+
+# # Przycisk do pobrania
+# st.download_button(
+#     label="⬇️ Pobierz przefiltrowane dane jako CSV",
+#     data=csv_data_filtered,
+#     file_name=f"{filtered_name}.csv",
+#     mime="text/csv",
+# )
+download_csv_button(
+    df=filtered_df,
+    file_name=filtered_name,
+    label="⬇️ Pobierz przefiltrowane dane jako CSV"
+)
+
+# ===============================================================
+# 💾 Dowland filtered data as EXEL
+# ===============================================================
+
+if st.button("💾 Zapisz przefiltorane dane jako Excel"):
+    excel_data = to_excel(filtered_df)
+    st.download_button(
+        label="⬇️ Pobierz plik Excel",
+        data=excel_data,
+        file_name=filtered_name,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
