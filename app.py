@@ -129,14 +129,16 @@ if "data_ready" not in st.session_state:
 if 'uploaded_file_for_csv' not in st.session_state:
     st.session_state['uploaded_file_for_csv'] = None
 
-if "analyze_mode" not in st.session_state:
-    st.session_state["analyze_mode"] = False
+if "url_input" not in st.session_state:
+    st.session_state["url_input"] = None
 
+# Hardcore the url adres for pdf
+url = "https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
 
+# The user can add a new calorie table if necessary.
+url_x= st.text_input("Podaj adres nowej tabeli kalorycznej", value=url)
 
-url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
-
-parsed_url = urlparse(url)
+parsed_url = urlparse(url_x)
 filename = os.path.basename(parsed_url.path)  # take the name "352978-tabela-wo-8-11-2023-mop.pdf"
 
 LOGS_PATH = Path("logs")
@@ -151,7 +153,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf'
+BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true'
 
 #######
 ##Functions
@@ -160,7 +162,7 @@ constant_cal_table = DIRS['json_calories_table']/'offer_classic.json'
 temporary_cal_table = DIRS['json_calories_table']/'offer_classic_temporary.json'
 
 if st.button('Pobierz pdf'):
-    scrape_pdf(url)
+    scrape_pdf(url_x)
 
 if st.button('Sparsuj PDF'):
     text = extracting_text_from_pdf(pdf_path_to_create_text)
