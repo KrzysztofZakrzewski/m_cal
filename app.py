@@ -131,7 +131,7 @@ if "url_input" not in st.session_state:
     st.session_state["url_input"] = None
 
 if "filtered_df" not in st.session_state:
-    st.session_state['"filtered_df"'] = None 
+    st.session_state["filtered_df"] = None 
 
 # Hardcore the url adres for pdf
 url = "https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
@@ -466,7 +466,7 @@ with st.sidebar:
 # 📦 Display after filters
 # ===============================================================
 st.markdown("### 📊 Wyniki filtrowania po produkcie")
-st.dataframe(filtered_df, use_container_width=True)
+st.dataframe(filtered_df, use_container_width=True, height=200)
 st.write(f"🔹 Liczba rekordów: {len(filtered_df)}")
 
 # Creating arguments only for charts BASE ON filtered_df BASE ON main_df
@@ -528,3 +528,28 @@ if st.button("💾 Zapisz przefiltorane dane jako Excel"):
         file_name=filtered_name,
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
+total_calories_for_pumps = filtered_df["kcal_razem"].sum()
+st.session_state["total_calories_for_pumps"] = total_calories_for_pumps  # zapis do session_state
+
+# Wyświetlenie metryki
+st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_pumps']:.0f} kcal")
+
+# --- Dane użytkownika ---
+# jeśli pole jeszcze nie istnieje, utwórz je w session_state
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = ""
+
+# input do wpisania np. "mężczyzna, 80kg, 30 lat"
+st.session_state["user_info"] = st.text_input(
+    "Podaj: płeć, wagę, wiek, wzrost",
+    value=st.session_state["user_info"]
+)
+
+st.write("👤 Dane użytkownika:", st.session_state["user_info"])
+
+
+
+if st.button('Podaj plan treningowy'):
+    answer = ask_ai(st.session_state["user_info"],total_calories_for_pumps)
+    st.write(answer)
