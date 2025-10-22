@@ -113,7 +113,7 @@ if "filtered_df" not in st.session_state:
     st.session_state["filtered_df"] = None 
 
 # Hardcore the url adres for pdf
-url = "https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
+url = "https://cdn.mcdonalds.pl/uploads/20251021094322/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
 
 # The user can add a new calorie table if necessary.
 url_x= st.text_input("Podaj adres nowej tabeli kalorycznej", value=url)
@@ -142,7 +142,7 @@ constant_cal_table = DIRS['json_calories_table']/'offer_classic.json'
 temporary_cal_table = DIRS['json_calories_table']/'offer_classic_temporary.json'
 
 if st.button('Pobierz pdf'):
-    scrape_pdf(url_x)
+    scrape_pdf(url_x, filename)
 
 if st.button('Sparsuj PDF'):
     text = extracting_text_from_pdf(pdf_path_to_create_text)

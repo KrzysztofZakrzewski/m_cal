@@ -8,10 +8,10 @@ from dirs import DIRS
 raw_pdf_PATH = DIRS["pdf"]
 pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'
 
-url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
+# url = "https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf"
 
-parsed_url = urlparse(url)
-filename = os.path.basename(parsed_url.path)  # take the name "352978-tabela-wo-8-11-2023-mop.pdf"
+# parsed_url = urlparse(url)
+# filename = os.path.basename(parsed_url.path)  # take the name "352978-tabela-wo-8-11-2023-mop.pdf"
 
 LOGS_PATH = DIRS["logs"]
 LOGS_FILE = LOGS_PATH / 'logs.log'
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20250910144011/352978-tabela-wo-8-11-2023-mop.pdf'
 
-def scrape_pdf(url):
+def scrape_pdf(url, filename):
     try:
         url
         response = requests.get(
