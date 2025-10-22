@@ -57,7 +57,7 @@ def get_openai_client():
 from dirs import DIRS
 from scaper import scrape_pdf
 from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_user_df_to_main_df
-from utils import change_receipt_for_binary, reading_calories_table
+from utils import change_receipt_for_binary, reading_calories_table, delete_recipt_img, delete_temporary_jsons
 from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
 from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
 from pdf_parser import extracting_text_from_pdf, new_caloris_table_from_pdf_json, merge_json_files
@@ -255,6 +255,7 @@ if uploaded_receipt_image is not None:
             st.session_state["df"] = receipt_of_user_to_dataframe(st.session_state['path_for_receipt_parsed'], st.session_state["calories"])
             st.success("Obraz przetworzony")
 
+
             st.session_state["data_ready"] = True
 
         else:
@@ -271,7 +272,13 @@ if st.session_state.get("data_ready", False):
             st.session_state["main_df"],
             st.session_state["df"]
         )
+
+        # ------ Cleanig recipt folder after procesing
+        delete_recipt_img(st.session_state['user_receipt'])
+        delete_temporary_jsons(DIRS['temporary_json_from_receipt'])
+        delete_temporary_jsons(DIRS['temporary_json_parsed'])
         st.success("Dodano nowe dane")
+
 
 # Always show master database
 st.text('')

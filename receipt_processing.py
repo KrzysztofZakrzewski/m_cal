@@ -146,7 +146,7 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     6. Zwróć TYLKO poprawiony JSON, bez żadnych komentarzy ani tekstu opisu.
 
     Mapowanie nazw produktów:
-    "FL Wan Lio Czek": "McFlurry waniliowe Lion z polewą o smaku czekoladowym",
+    "FL Wan Lio Czek": "McFlurry o smaku waniliowym KitKat z polewą o smaku czekoladowym",
     "WrapChrup Klas": "McWrap Chrupiący Klasyczny",
     "Frytki Mal Pol": "Frytki Małe",
     "FrytkiMala Por.": "Frytki Małe",
