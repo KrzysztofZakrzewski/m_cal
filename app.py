@@ -1,33 +1,12 @@
-import json
-import requests
-from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
-#add Path
 import pandas as pd
 from pathlib import Path
 import numpy as np
-from datetime import datetime
-import re
-import time
-import random
-import plotly.express as px
 import logging
 import os
-import io
-from io import StringIO, BytesIO
+from io import StringIO
 from urllib.parse import urlparse # scraper
-import matplotlib.pyplot as plt
-from openpyxl import Workbook
-
-import base64
-from getpass import getpass
-
-from IPython.display import Image, display, FileLink,IFrame
-import instructor
-from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
-
-import pdfplumber
 import streamlit as st
 load_dotenv()
 
