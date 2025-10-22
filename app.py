@@ -62,7 +62,7 @@ from receipt_processing import loading_data_from_receipt_into_json, parsing_data
 from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
 from pdf_parser import extracting_text_from_pdf, new_caloris_table_from_pdf_json, merge_json_files
 from data_export import download_csv_button, to_excel
-
+from ai_calorie_trainer import ask_ai
 # ===============================================================
 # 📦 PATHS
 # ===============================================================
