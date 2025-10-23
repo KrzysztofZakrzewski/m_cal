@@ -1,5 +1,5 @@
 import pandas as pd
-from dirs import DIRS
+from src.dirs import DIRS
 import json
 from typing import Dict, Any, Union
 

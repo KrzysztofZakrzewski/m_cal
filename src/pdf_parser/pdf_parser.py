@@ -1,4 +1,4 @@
-from dirs import DIRS
+from src.dirs import DIRS
 import pdfplumber
 import re
 import json

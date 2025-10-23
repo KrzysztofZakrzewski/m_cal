@@ -1,6 +1,6 @@
 from openai import OpenAI
 import os
-from dirs import DIRS
+from src.dirs import DIRS
 from typing import Optional, Dict, Any
 
 # get openai client

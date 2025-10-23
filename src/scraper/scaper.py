@@ -3,7 +3,7 @@ import logging
 import requests
 from urllib.parse import urlparse
 from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
-from dirs import DIRS
+from src.dirs import DIRS
 
 raw_pdf_PATH = DIRS["pdf"]
 pdf_path_to_create_text = raw_pdf_PATH/'352978-tabela-wo-8-11-2023-mop.pdf'

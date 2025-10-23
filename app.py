@@ -33,15 +33,43 @@ def get_openai_client():
 # - utils: general-purpose helpers (file conversion, calorie table loading)
 # - receipt_processing: OCR and JSON parsing of receipts
 # - chars: visualization utilities (Plotly charts
-from dirs import DIRS
-from scaper import scrape_pdf
-from base_dataframe import create_main_df, receipt_of_user_to_dataframe, append_user_df_to_main_df
-from utils import change_receipt_for_binary, reading_calories_table, delete_recipt_img, delete_temporary_jsons
-from receipt_processing import loading_data_from_receipt_into_json, parsing_data_from_receipt_raw_into_json
-from chars import calorie_distribution_per_product_chart, total_calories_consumed_each_month_chart, distribution_of_money_spent_per_product_chart, total_money_spend_each_month_chart
-from pdf_parser import extracting_text_from_pdf, new_caloris_table_from_pdf_json, merge_json_files
-from data_export import download_csv_button, to_excel
-from ai_calorie_trainer import ask_ai
+from src.dirs import DIRS
+from src.scraper.scaper import (
+    scrape_pdf
+)
+from src.data.base_dataframe import (
+    create_main_df,
+    receipt_of_user_to_dataframe,
+    append_user_df_to_main_df
+)
+from src.utils.utils import (
+    change_receipt_for_binary,
+    reading_calories_table, delete_recipt_img, 
+    delete_temporary_jsons
+) 
+from src.receipt_processing.receipt_processing import (
+    loading_data_from_receipt_into_json,
+    parsing_data_from_receipt_raw_into_json
+)
+from src.pltos.chars import (
+    calorie_distribution_per_product_chart,
+    total_calories_consumed_each_month_chart,
+    distribution_of_money_spent_per_product_chart,
+    total_money_spend_each_month_chart
+)
+from src.pdf_parser.pdf_parser import (
+    
+    extracting_text_from_pdf, 
+    new_caloris_table_from_pdf_json,
+    merge_json_files
+)
+from src.data.data_export import (
+    download_csv_button,
+    to_excel
+)
+from src.ai_trainer.ai_calorie_trainer import (
+    ask_ai
+)
 # ===============================================================
 # 📦 PATHS
 # ===============================================================
