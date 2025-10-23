@@ -12,7 +12,7 @@ def init_dirs()-> Dict[str, Path]:
     Returns:
         dirs (Dict[str, Path]): A dictionary mapping folder names to their Path objects.
     """
-    BASE_DIR = Path(__file__).resolve().parent
+    BASE_DIR = Path(__file__).resolve().parent.parent
     dirs = {
         # "test1": BASE_DIR / "test1",
         # "test2": BASE_DIR / "test2",
