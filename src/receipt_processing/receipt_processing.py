@@ -148,6 +148,7 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     Mapowanie nazw produktów:
     "FL Wan Lio Czek": "McFlurry o smaku waniliowym KitKat z polewą o smaku czekoladowym",
     "WrapChrup Klas": "McWrap Chrupiący Klasyczny",
+    "Wrap Chrup Klas": "McWrap Chrupiący Klasyczny",
     "Frytki Mal Pol": "Frytki Małe",
     "FrytkiMala Por.": "Frytki Małe",
     "Frytki M": "Frytki Średnie",
