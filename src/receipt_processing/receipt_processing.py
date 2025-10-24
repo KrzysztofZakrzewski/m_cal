@@ -149,16 +149,20 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     "FL Wan Lio Czek": "McFlurry o smaku waniliowym KitKat z polewą o smaku czekoladowym",
     "WrapChrup Klas": "McWrap Chrupiący Klasyczny",
     "Wrap Chrup Klas": "McWrap Chrupiący Klasyczny",
+    "WrapBekDeLuxChr": "McWrap Chrupiący Bekon Deluxe"
+    "McRoyal M": "McRoyal"
     "Frytki Mal Pol": "Frytki Małe",
     "FrytkiMala Por.": "Frytki Małe",
     "Frytki M": "Frytki Średnie",
     "Frytki Srednie": "Frytki Średnie",
+    "Frytki Duze": "Frytki Duże"
     "Sos Smietanowy": "Sos Śmietanowy",
     "Tenders 3": "Chicken Tenders 3 szt.",
     "Sos Siri Mayo": "Sos Sriracha Mayo",
     "Kanapka Chikker": "Chikker",
     "Ketchup Platny": "Ketchup",
-    "Kaj Wie Wiel": "Wieloziarnista Kajzerka Kurczak Premium",
+    "Kaj Wie Wiel": "Wieloziarnista Podwójna Kajzerka Wieprzowa DeLuxe",
+    "Kaj Wie Wiel M": "Wieloziarnista Podwójna Kajzerka Wieprzowa DeLuxe",
     "MuffinWiepJajko": "McMuffin Wieprzowy z Jajkiem",
     "Wafel Czekolada": "Lody o smaku waniliowym z polewą o smaku czekoladowym",
     "Kubek Czekolada": "Lody o smaku waniliowym z polewą o smaku czekoladowym",
@@ -166,7 +170,12 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     "Wafel Karmel": "Lody o smaku waniliowym z polewą karmelową",
     "Jalapeno Burger": "Jalapeño Burger",
     "Sos SlodkoKwasny": "Sos Słodko-Kwaśny",
-    "0,4l Coca Cola": "Coca-Cola 0,4l"
+    "0,25 CocaColaStr": "Coca-Cola 0,25l"
+    "0,4l Coca Cola": "Coca-Cola 0,4l",
+    "0,4l Coca Cola M": "Coca-Cola 0,4l",
+    "0,2l Cappucino": "Cappuccino 0,2l",
+    "MuffinWiepJajko": "McMuffin Wieprzowy z Jajkiem",
+    "0,4 CarLatMacch": "Caramel Latte Macchiato 0,4l"
 
     Zwróć poprawiony JSON.
     """
