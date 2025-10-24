@@ -182,7 +182,15 @@ if st.button('Sparsuj PDF'):
 # If the user already has a saved dataset (CSV), 
 # they can upload it here for further analysis.
 # ===============================================================
-st.session_state['uploaded_file_for_csv'] = st.file_uploader("⬇️ Wybierz plik CSV, jeśli już posiadasz", type=["csv"])
+st.markdown("""
+    <style>
+    .compact-header {
+        margin-bottom: 0rem !important;
+    }
+    </style>
+    <h4 class="compact-header">⬇️ Wybierz plik CSV, jeśli już posiadasz</h4>
+    """, unsafe_allow_html=True)
+st.session_state['uploaded_file_for_csv'] = st.file_uploader("", type=["csv"])
 
 
 if st.session_state['uploaded_file_for_csv'] is not None:
@@ -217,7 +225,15 @@ if st.session_state['uploaded_file_for_csv'] is not None:
 # ===============================================================
 # 📦 Uploading a photo of the prescription
 # ===============================================================
-uploaded_receipt_image = st.file_uploader("Wybierz zdjęcie paragonu aby dodać nowe dane", type=["png", "jpg", "jpeg"])
+st.markdown("""
+    <style>
+    .compact-header {
+        margin-bottom: 0rem !important;
+    }
+    </style>
+    <h3 class="compact-header">🧾 Wybierz zdjęcie paragonu aby dodać nowe dane</h3>
+    """, unsafe_allow_html=True)
+uploaded_receipt_image = st.file_uploader("", type=["png", "jpg", "jpeg"])
 
 # ===============================================================
 # 📦 PROCESING THE IMAGE IN DATAFRAME
@@ -398,7 +414,7 @@ with st.sidebar:
             (filtered_df["cena_razem"] <= selected_range[1])
         ]
     else:
-        st.warning("Brak danych w kolumnie 'cena_razem'.")
+        st.warning("Brak danych do filtrowania.")
 
 
     # Total amount for receipt
@@ -426,7 +442,7 @@ with st.sidebar:
             ]
 
     else:
-        st.warning("Brak danych w kolumnie 'łączna kwota za paragon'.")
+        st.warning("Brak danych do filtrowania.")
 
     # City
     city = st.sidebar.multiselect('Miasto', ["(Wszystkie)"] + list(DATA["miasto"].dropna().unique()))
@@ -467,7 +483,7 @@ with st.sidebar:
         else:
             st.warning("Wybierz poprawny zakres dat (od – do).")
     else:
-        st.warning("Brak danych w kolumnie 'data'.")
+        st.warning("Brak danych do filtrowania.")
 
 # ===============================================================
 # 📦 Display after filters
