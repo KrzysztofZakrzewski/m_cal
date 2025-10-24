@@ -75,6 +75,10 @@ def total_calories_consumed_each_month_chart(chart_data: pd.DataFrame) -> None:
             text_auto=True
         )
 
+        # The months are already displayed in chronological order on the chart,
+        # so no manual sorting is required.
+        fig_monthly.update_xaxes(type="category")
+
         fig_monthly.update_layout(
             xaxis_title="Miesiąc",
             yaxis_title="Łączna liczba kcal",
@@ -150,6 +154,10 @@ def total_money_spend_each_month_chart(chart_data: pd.DataFrame) -> None:
             title="💸 Suma łączna pieniędzy wydanych w kazdym miesiącu miesiąc",
             text_auto=True
         )
+
+        # The months are already displayed in chronological order on the chart,
+        # so no manual sorting is required.
+        fig_monthly.update_xaxes(type="category")
 
         fig_monthly.update_layout(
             xaxis_title="Miesiąc",

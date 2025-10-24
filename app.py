@@ -492,7 +492,7 @@ st.markdown("<h2>🍗Podsumowanie kalori</h2>", unsafe_allow_html=True)
 # This tabbed layout allows users to quickly compare calorie intake and 
 # spending patterns using the same filters for consistency.
 
-tab1, tab2, tab3 = st.tabs(["Produkty", "Mieiące", "Miasta"])
+tab1, tab2 = st.tabs(["Produkty", "Mieiące"])
 
 with tab1:
     calorie_distribution_per_product_chart(bars_df)
@@ -502,7 +502,7 @@ with tab2:
 
 st.markdown("<h2>💰Podsumowanie finansów</h2>", unsafe_allow_html=True)
 
-tab4, tab5, tab6 = st.tabs(["Produkty", "Mieiące", "Miasta"])
+tab4, tab5 = st.tabs(["Produkty", "Mieiące"])
 with tab4:
     distribution_of_money_spent_per_product_chart(bars_df)
 with tab5:
