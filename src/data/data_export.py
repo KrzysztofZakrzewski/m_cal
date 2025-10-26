@@ -2,6 +2,7 @@ import io
 import streamlit as st
 from openpyxl import Workbook
 import pandas as pd
+from fpdf import FPDF
 
 # ===============================================================
 # 💾 CSV Dowland functions
@@ -63,3 +64,27 @@ def to_excel(df: pd.DataFrame) -> bytes:
         df.to_excel(writer, index=False, sheet_name="Dane")
     processed_data = output.getvalue()
     return processed_data
+
+
+# ===============================================================
+# 💾 PDF Export functions for traing plan
+# ===============================================================
+
+def save_training_plan_to_pdf(text: str, filename: str = "plan_treningowy.pdf") -> str:
+    """
+    Creates a PDF with the given text and saves it to a file.
+
+    Args:
+        text (str): Text content to include in the PDF.
+        filename (str): Name of the PDF file to save.
+
+    Returns:
+        str: Path to the saved PDF file.
+    """
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.add_font("DejaVu", "", "src/fonts/DejaVuSans.ttf", uni=True)  # dodaj czcionkę obsługującą UTF-8
+    pdf.set_font("DejaVu", size=12)
+    pdf.multi_cell(0, 10, txt=text)
+    pdf.output(filename)
+    return filename

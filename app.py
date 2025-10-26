@@ -58,14 +58,14 @@ from src.pltos.chars import (
     total_money_spend_each_month_chart
 )
 from src.pdf_parser.pdf_parser import (
-    
     extracting_text_from_pdf, 
     new_caloris_table_from_pdf_json,
     merge_json_files
 )
 from src.data.data_export import (
     download_csv_button,
-    to_excel
+    to_excel,
+    save_training_plan_to_pdf
 )
 from src.ai_trainer.ai_calorie_trainer import (
     ask_ai
@@ -624,5 +624,27 @@ st.write("👤 Dane użytkownika:", st.session_state["user_info"])
 # and the calculated total calories from previous computations.
 # The AI then generates and returns a personalized training plan, which is displayed in the Streamlit app.
 if st.button('Podaj plan treningowy'):
-    answer = ask_ai(st.session_state["user_info"], total_calories_for_ask_ai, st.session_state["filtered_period_time"])
+    answer = ask_ai(st.session_state["user_info"],
+                    total_calories_for_ask_ai,
+                    st.session_state["filtered_period_time"])
+    # View answer form ask_ai
     st.write(answer)
+
+    # Saving to PDF using the function
+    # pdf_file = save_training_plan_to_pdf(answer)
+    # Saving the response in session_state to make it available for the PDF button
+    st.session_state["last_training_plan"] = answer
+
+    # Udostępnienie pobrania w Streamlit
+if "last_training_plan" in st.session_state:
+    if st.button("Pobierz plan treningowy jako PDF"):
+        pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"])
+        
+        # Udostępnienie pobrania
+        with open(pdf_file, "rb") as f:
+            st.download_button(
+                label="Kliknij tutaj, aby pobrać PDF",
+                data=f,
+                file_name=st.session_state["user_main_df_name"],
+                mime="application/pdf"
+            )
