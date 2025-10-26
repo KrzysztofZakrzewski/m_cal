@@ -8,11 +8,6 @@ from urllib.parse import urlparse # scraper
 from dotenv import load_dotenv
 from openai import OpenAI
 import streamlit as st
-# import json
-# if st.session_state:
-#     st.code(json.dumps(dict(st.session_state), indent=2, default=str))
-# else:
-#     st.info("Brak danych w st.session_state.")
 load_dotenv()
 
 
@@ -165,12 +160,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
-BASE_URL = 'https://cdn.mcdonalds.pl/uploads/20251020194126/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true'
-
-#######
-##Functions
-
 constant_cal_table = DIRS['json_calories_table']/'offer_classic.json'
 temporary_cal_table = DIRS['json_calories_table']/'offer_classic_temporary.json'
 
@@ -196,7 +185,6 @@ st.markdown("""
     <h4 class="compact-header">⬇️ Wybierz plik CSV, jeśli już posiadasz</h4>
     """, unsafe_allow_html=True)
 st.session_state['uploaded_file_for_csv'] = st.file_uploader("", type=["csv"])
-
 
 if st.session_state['uploaded_file_for_csv'] is not None:
     # 1️⃣ Loading CSV into DataFrame directly into session_state
@@ -307,7 +295,6 @@ if st.session_state.get("data_ready", False):
         delete_temporary_jsons(DIRS['temporary_json_parsed'])
         st.success("Dodano nowe dane")
 
-
 # Always show master database
 st.text('')
 st.dataframe(st.session_state["main_df"], height=200)
@@ -356,7 +343,6 @@ if st.button("💾 Zapisz jako Excel"):
         file_name=st.session_state['user_main_df_name'],
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-
 
 # ===============================================================
 # 🔍 FILTERS
@@ -557,36 +543,40 @@ if st.button("💾 Zapisz przefiltorane dane jako Excel"):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
+# ===============================================================
+# 📺 Displaying the metrics
+# ===============================================================
+# Aggregate key metrics from the filtered dataset and persist them in session_state
+# to maintain state across Streamlit app interactions.
 total_calories_for_pumps = filtered_df["kcal_razem"].sum()
 total_money_spend = filtered_df["łączna kwota za paragon"].sum()
-st.session_state["total_calories_for_pumps"] = total_calories_for_pumps  # zapis do session_state
-st.session_state["łączna kwota za paragon"] = total_money_spend  # zapis do session_state
+total_mone_for_one_type_of_product = filtered_df["cena_razem"].sum()
+st.session_state["total_calories_for_pumps"] = total_calories_for_pumps  # save to session_state session_state
+st.session_state["łączna kwota za paragon"] = total_money_spend  # save to session_state session_state
+st.session_state["cena_razem"] = total_mone_for_one_type_of_product  # save to session_state session_state
 
-# Wyświetlenie metryki
+# Displaying the metrics
 st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_pumps']:.0f} kcal")
+st.metric("Pieniądze wydane na przefiltrowane produkty", f"{st.session_state['cena_razem']:.0f} PLN")
 st.metric("Całkowite wydane pieniądze", f"{st.session_state['łączna kwota za paragon']:.0f} PLN")
 
-# --- Dane użytkownika ---
-# jeśli pole jeszcze nie istnieje, utwórz je w session_state
+# --- User data ---
+# if the field does not already exist, it will be created in session_state
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = ""
 
-# input do wpisania np. "mężczyzna, 80kg, 30 lat"
+# input to enter e.g. "male, 80kg, 30 years old"
 st.session_state["user_info"] = st.text_input(
     "Podaj: płeć, wagę, wiek, wzrost",
     value=st.session_state["user_info"]
 )
-
+# Displey user_info
 st.write("👤 Dane użytkownika:", st.session_state["user_info"])
 
-
-
+# When the user clicks the "Podaj plan treningowy" button, the app calls the ask_ai() function,
+# passing in the user's personal information (sex, weight, age, height) stored in session_state["user_info"]
+# and the calculated total calories from previous computations.
+# The AI then generates and returns a personalized training plan, which is displayed in the Streamlit app.
 if st.button('Podaj plan treningowy'):
     answer = ask_ai(st.session_state["user_info"],total_calories_for_pumps)
     st.write(answer)
-# import json
-
-# if st.session_state:
-#     st.code(json.dumps(dict(st.session_state), indent=2, default=str))
-# else:
-#     st.info("Brak danych w st.session_state.")
