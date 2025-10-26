@@ -8,6 +8,11 @@ from urllib.parse import urlparse # scraper
 from dotenv import load_dotenv
 from openai import OpenAI
 import streamlit as st
+# import json
+# if st.session_state:
+#     st.code(json.dumps(dict(st.session_state), indent=2, default=str))
+# else:
+#     st.info("Brak danych w st.session_state.")
 load_dotenv()
 
 
@@ -553,10 +558,13 @@ if st.button("💾 Zapisz przefiltorane dane jako Excel"):
     )
 
 total_calories_for_pumps = filtered_df["kcal_razem"].sum()
+total_money_spend = filtered_df["łączna kwota za paragon"].sum()
 st.session_state["total_calories_for_pumps"] = total_calories_for_pumps  # zapis do session_state
+st.session_state["łączna kwota za paragon"] = total_money_spend  # zapis do session_state
 
 # Wyświetlenie metryki
 st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_pumps']:.0f} kcal")
+st.metric("Całkowite wydane pieniądze", f"{st.session_state['łączna kwota za paragon']:.0f} PLN")
 
 # --- Dane użytkownika ---
 # jeśli pole jeszcze nie istnieje, utwórz je w session_state
@@ -576,3 +584,9 @@ st.write("👤 Dane użytkownika:", st.session_state["user_info"])
 if st.button('Podaj plan treningowy'):
     answer = ask_ai(st.session_state["user_info"],total_calories_for_pumps)
     st.write(answer)
+# import json
+
+# if st.session_state:
+#     st.code(json.dumps(dict(st.session_state), indent=2, default=str))
+# else:
+#     st.info("Brak danych w st.session_state.")

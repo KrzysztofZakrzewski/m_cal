@@ -2,6 +2,7 @@ import pandas as pd
 from src.dirs import DIRS
 import json
 from typing import Dict, Any, Union
+import streamlit as st
 
 def create_main_df(save: bool = True) -> pd.DataFrame:
     '''
@@ -49,6 +50,11 @@ def receipt_of_user_to_dataframe(path_for_receipt_parsed: str, calories: Dict[st
     # read json
     with open(path_for_receipt_parsed, "r", encoding="utf-8") as f:
         receipt = json.load(f)
+
+    # 🛡️ Safeguard:: empty file or invalid structure
+    if not isinstance(receipt, dict) or len(receipt) == 0:
+        st.warning("⚠️ Nie udało się wczytać danych — plik paragonu jest pusty lub ma niepoprawny format.")
+        return pd.DataFrame()
     # dataholder
     data = []
 
@@ -85,7 +91,10 @@ def receipt_of_user_to_dataframe(path_for_receipt_parsed: str, calories: Dict[st
             })
 
     df = pd.DataFrame(data)
-    df['data'] = pd.to_datetime(df['data'] + ' ' + df['godzina'])
+    # df['data'] = pd.to_datetime(df['data'] + ' ' + df['godzina'])
+    df['data'] = pd.to_datetime(df['data'] + ' ' + df['godzina'], errors="coerce")
+    if df["data"].isna().any():
+        st.warning("⚠️ Wykryto błędne dane daty — możliwe, że wgrano niepoprawny paragon.")
 
         # opcjonalnie usuń kolumnę 'godzina', jeśli niepotrzebna
         # df = df.drop(columns=['godzina'])

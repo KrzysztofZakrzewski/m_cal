@@ -24,6 +24,9 @@ def loading_data_from_receipt_into_json(prepared_receipt: str) -> None:
     # Returns:
     #     None: The function saves the parsed receipt JSON to a file in 
     #           DIRS['temporary_json_from_receipt'].
+
+    # 🛡️Gives:
+    #   an empty dataframe if we upload an incorrect photo
     
     
     response = get_openai_client().chat.completions.create(
@@ -75,7 +78,7 @@ def loading_data_from_receipt_into_json(prepared_receipt: str) -> None:
     "miasto": "...",
     "ulica": "..."
     }
-
+    JEŻELI OBRAZ NIE BĘDZIE ZAWIERAŁ INFORMACJI STWÓRZ PUSTEGO
     tylko dane jako JSON, bez żadnych komentarzy
     """
                     },
@@ -105,9 +108,12 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     # normalization (e.g., mapping Polish product names to English equivalents),
     # and save the cleaned version as 'receipt_parsed.json'.
 
-    #Returns:
+    # Returns:
     #    Optional[Dict[str, Any]]: Parsed and cleaned JSON data if successful, 
     #                              otherwise None if the file doesn't exist or is invalid.
+
+    # 🛡️Gives:
+    #    an empty dataframe if the json from the previous function is empty
 
     # Path to the raw JSON file
     receipt_raw_path = DIRS['temporary_json_from_receipt'] / "receipt_raw.json"
@@ -177,6 +183,7 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     "MuffinWiepJajko": "McMuffin Wieprzowy z Jajkiem",
     "0,4 CarLatMacch": "Caramel Latte Macchiato 0,4l"
 
+    JEŻELI JSON NIE BĘDZIE ZAWIERAŁ INFORMACJI STWÓRZ PUSTEGO JSON
     Zwróć poprawiony JSON.
     """
 
