@@ -7,17 +7,19 @@ from typing import Optional, Dict, Any
 def get_openai_client():
     return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-def ask_ai(user_info: str, total_calories: float) -> str:
+def ask_ai(user_info: str, total_calories: float, filtered_period_time: str) -> str:
     """
     Send user info and total calories to OpenAI model and return a humorous, realistic training plan.
     """
 
     prompt = f"""
-    Użytkownik(płeć, waga, wiek, wzrost): {user_info}.
-    Zjadł łącznie {total_calories:.0f} kcal z McDonalda.
+    Użytkownik(płeć, wiek, waga, wzrost): {user_info}.
+    Zjadł łącznie {total_calories:.0f} kcal z McDonalda,
+    okresie czasu {filtered_period_time}.
     Potraktuj te kalorie jako nadmiarowe.
-    Napisz lekko zabawny, ale realistyczny plan treningowy,
-    ile pompek, przysiadów lub kilometrów biegu musi zrobić, żeby spalić ten nadmiar.
+    Napisz realistyczny plan treningowy,
+    ile pompek, przysiadów lub kilometrów biegu musi zrobić użytkownik, żeby spalić ten nadmiar.
+    Powiec jaki okres czasu został Ci przekazany, w którym użytkownik wchłaniał kalorie.
     """
 
     response = get_openai_client().chat.completions.create(

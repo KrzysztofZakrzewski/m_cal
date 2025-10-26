@@ -127,7 +127,7 @@ if "name_of_uloded_df" not in st.session_state:
 if "user_main_df_name" not in st.session_state:
     st.session_state["user_main_df_name"] = "moja_baza"
 
-# Wyświetlaj ramkę danych POZA blokiem przycisku
+# Display data frame OUTSIDE the button block
 if "data_ready" not in st.session_state:
     st.session_state["data_ready"] = False
 
@@ -139,6 +139,14 @@ if "url_input" not in st.session_state:
 
 if "filtered_df" not in st.session_state:
     st.session_state["filtered_df"] = None 
+
+# User info for ask_ai()
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
+
+# filtered_period_time for argument for ask_ai()
+if "filtered_period_time" not in st.session_state:
+    st.session_state["filtered_period_time"] = None
 
 # Hardcore the url adres for pdf
 url = "https://cdn.mcdonalds.pl/uploads/20251021094322/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
@@ -470,6 +478,11 @@ with st.sidebar:
                 (filtered_df["data"].dt.date >= start_date) &
                 (filtered_df["data"].dt.date <= end_date)
             ]
+            date_range_str = f"od {start_date} do {end_date}"
+
+            # add period time do st.session_time
+            st.session_state["filtered_period_time"] = date_range_str
+
             st.write(f"📊 Wybrany zakres: **{start_date} – {end_date}**")
         else:
             st.warning("Wybierz poprawny zakres dat (od – do).")
@@ -548,26 +561,59 @@ if st.button("💾 Zapisz przefiltorane dane jako Excel"):
 # ===============================================================
 # Aggregate key metrics from the filtered dataset and persist them in session_state
 # to maintain state across Streamlit app interactions.
-total_calories_for_pumps = filtered_df["kcal_razem"].sum()
-total_money_spend = filtered_df["łączna kwota za paragon"].sum()
-total_mone_for_one_type_of_product = filtered_df["cena_razem"].sum()
-st.session_state["total_calories_for_pumps"] = total_calories_for_pumps  # save to session_state session_state
-st.session_state["łączna kwota za paragon"] = total_money_spend  # save to session_state session_state
-st.session_state["cena_razem"] = total_mone_for_one_type_of_product  # save to session_state session_state
 
-# Displaying the metrics
-st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_pumps']:.0f} kcal")
-st.metric("Pieniądze wydane na przefiltrowane produkty", f"{st.session_state['cena_razem']:.0f} PLN")
-st.metric("Całkowite wydane pieniądze", f"{st.session_state['łączna kwota za paragon']:.0f} PLN")
+
+#==================================================
+
+# total_calories_for_ask_ai = filtered_df["kcal_razem"].sum()
+# # Compering to all money
+# total_money_spend_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
+# total_money_filtred_for_ask_ai = filtered_df["cena_razem"].sum()
+
+# st.session_state["total_calories_for_ask_ai"] = total_calories_for_ask_ai  # save to session_state session_state
+# st.session_state["total_money_spend_for_ask_ai"] = total_money_spend_for_ask_ai  # save to session_state session_state
+# st.session_state["total_money_filtred_for_ask_ai"] = total_money_filtred_for_ask_ai  # save to session_state session_state
+
+# # Displaying the metrics
+# st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_ask_ai']} kcal")
+
+# if filtered_df is not None and not filtered_df.empty:
+#     total_money_filtred_for_ask_ai = filtered_df["cena_razem"].sum()
+# else:
+#     total_money_filtred_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
+
+# st.metric(
+#     "💰 Pieniądze wydane na przefiltrowane produkty",
+#     f"{st.session_state['total_money_filtred_for_ask_ai']:.2f} PLN"
+# )
+
+# st.metric("Całkowite wydane pieniądze", f"{st.session_state['total_money_spend_for_ask_ai']:.2f} PLN")
+
+# Calculate totals for AI
+total_calories_for_ask_ai = filtered_df["kcal_razem"].sum()
+total_money_spend_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
+
+# Filtered money: handle empty filtered_df
+if filtered_df is not None and not filtered_df.empty:
+    total_money_filtred_for_ask_ai = filtered_df["cena_razem"].sum()
+else:
+    total_money_filtred_for_ask_ai = total_money_spend_for_ask_ai
+
+# Save to session_state
+st.session_state["total_calories_for_ask_ai"] = total_calories_for_ask_ai
+st.session_state["total_money_spend_for_ask_ai"] = total_money_spend_for_ask_ai
+st.session_state["total_money_filtred_for_ask_ai"] = total_money_filtred_for_ask_ai
+
+# Display metrics
+st.metric("Łączna liczba zjedzonych kalorii", f"{total_calories_for_ask_ai} kcal")
+st.metric("💰 Pieniądze wydane na przefiltrowane produkty", f"{total_money_filtred_for_ask_ai:.2f} PLN")
+st.metric("Całkowite wydane pieniądze", f"{total_money_spend_for_ask_ai:.2f} PLN")
 
 # --- User data ---
-# if the field does not already exist, it will be created in session_state
-if "user_info" not in st.session_state:
-    st.session_state["user_info"] = ""
 
-# input to enter e.g. "male, 80kg, 30 years old"
+# input to enter User data. e.g. "male, 80kg, 30 years old"
 st.session_state["user_info"] = st.text_input(
-    "Podaj: płeć, wagę, wiek, wzrost",
+    "Podaj: płeć, wiek, wagę, wzrost",
     value=st.session_state["user_info"]
 )
 # Displey user_info
@@ -578,5 +624,5 @@ st.write("👤 Dane użytkownika:", st.session_state["user_info"])
 # and the calculated total calories from previous computations.
 # The AI then generates and returns a personalized training plan, which is displayed in the Streamlit app.
 if st.button('Podaj plan treningowy'):
-    answer = ask_ai(st.session_state["user_info"],total_calories_for_pumps)
+    answer = ask_ai(st.session_state["user_info"], total_calories_for_ask_ai, st.session_state["filtered_period_time"])
     st.write(answer)

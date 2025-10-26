@@ -29,7 +29,7 @@ def calorie_distribution_per_product_chart(chart_data: pd.DataFrame) -> None:
             x="produkt",
             y="kcal_razem",
             title="Rozkład kalorii na produkt",
-            color="miasto",
+            # color="miasto",
             nbins=10,
             text_auto=True
         )
@@ -107,12 +107,12 @@ def distribution_of_money_spent_per_product_chart(chart_data: pd.DataFrame) -> N
     if not chart_data.empty:
         fig_price = px.histogram(
             chart_data,
-            x="produkt",             # nazwa kolumny na osi X
-            y="cena_razem",          # (opcjonalnie) co ma być na osi Y
+            x="produkt",             # x-axis column name
+            y="cena_razem",          # (optional) what should be on the Y axis
             title="Rozkład wydanych pieniedży na produkt",
-            color="miasto",          # (opcjonalnie) grupowanie kolorami
-            nbins=10,                # liczba przedziałów histogramu
-            text_auto=True           # liczby nad słupkami
+            # color="miasto",          # (optional) grup by city kolorami
+            nbins=10,                # number of histogram intervals
+            text_auto=True           # numbers above the bars
         )
 
         fig_price.update_layout(
