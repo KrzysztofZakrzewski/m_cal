@@ -3,6 +3,7 @@ import streamlit as st
 from openpyxl import Workbook
 import pandas as pd
 from fpdf import FPDF
+from datetime import datetime
 
 # ===============================================================
 # 💾 CSV Dowland functions
@@ -70,7 +71,7 @@ def to_excel(df: pd.DataFrame) -> bytes:
 # 💾 PDF Export functions for traing plan
 # ===============================================================
 
-def save_training_plan_to_pdf(text: str, filename: str = "plan_treningowy.pdf") -> str:
+def save_training_plan_to_pdf(text: str, subtitle: str = "Plan Treningowy") -> str:
     """
     Creates a PDF with the given text and saves it to a file.
 
@@ -83,8 +84,34 @@ def save_training_plan_to_pdf(text: str, filename: str = "plan_treningowy.pdf") 
     """
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font("DejaVu", "", "src/fonts/DejaVuSans.ttf", uni=True)  # dodaj czcionkę obsługującą UTF-8
-    pdf.set_font("DejaVu", size=12)
-    pdf.multi_cell(0, 10, txt=text)
+    # add a font that supports UTF-8
+    pdf.add_font("DejaVu", "", "src/fonts/DejaVuSans.ttf", uni=True)
+    pdf.add_font("DejaVu", "B", "src/fonts/DejaVuSans-Bold.ttf", uni=True)
+    pdf.add_font("DejaVu", "I", "src/fonts/DejaVuSans-Oblique.ttf", uni=True)
+    
+    # Timestamp
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+    
+    # Title
+    pdf.set_font("DejaVu", "B", 16)
+    pdf.cell(0, 10, "Plan Treningowy Dla:", ln=True, align="C")
+
+    # Subtitle (second argument)
+    pdf.set_font("DejaVu", "I", 12)
+    # subtitle = f"{subtitle}, dnia: {timestamp}"
+    pdf.cell(0, 10, f"{subtitle}, dnia: {timestamp}", ln=True, align="C")
+    pdf.ln(10)
+
+    # Main text
+    pdf.set_font("DejaVu", "", 12)
+    pdf.multi_cell(0, 8, text)
+
+    pdf.ln(10)
+    pdf.set_font("DejaVu", "I", 10)
+    pdf.cell(0, 10, f"📅 Wygenerowano: {timestamp}", align="R")
+
+    # Save file (dynamic name)
+    filename = f"{subtitle.replace(' ', '_')}_{datetime.now().strftime('%Y-%m-%d')}.pdf"
     pdf.output(filename)
+
     return filename

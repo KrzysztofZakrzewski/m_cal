@@ -630,21 +630,24 @@ if st.button('Podaj plan treningowy'):
     # View answer form ask_ai
     st.write(answer)
 
-    # Saving to PDF using the function
-    # pdf_file = save_training_plan_to_pdf(answer)
     # Saving the response in session_state to make it available for the PDF button
     st.session_state["last_training_plan"] = answer
 
-    # Udostępnienie pobrania w Streamlit
+# --- Display generated training plan and provide PDF export option ---
+# If a training plan exists in session_state, display it and enable PDF download.
+# The plan remains visible across reruns thanks to session persistence.
 if "last_training_plan" in st.session_state:
-    if st.button("Pobierz plan treningowy jako PDF"):
-        pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"])
-        
-        # Udostępnienie pobrania
+    st.subheader("📋 Twój plan treningowy")
+    st.write(st.session_state["last_training_plan"])
+
+    # Allow user to export the displayed plan as a downloadable PDF file.
+    if st.button("📄 Pobierz plan treningowy jako PDF"):
+        # Saving to PDF using the function
+        pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"], st.session_state["user_main_df_name"])
         with open(pdf_file, "rb") as f:
             st.download_button(
-                label="Kliknij tutaj, aby pobrać PDF",
+                label="💾 Kliknij tutaj, aby pobrać PDF",
                 data=f,
-                file_name=st.session_state["user_main_df_name"],
+                file_name=pdf_file,
                 mime="application/pdf"
             )
