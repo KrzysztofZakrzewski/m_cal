@@ -2,7 +2,6 @@ pdf/
 logs/
 img/
 receipt/
-json_calories_table/
 
 # json_from_recepit.json
 temporary_json_from_receipt/*
