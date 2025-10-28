@@ -4,6 +4,7 @@ from openpyxl import Workbook
 import pandas as pd
 from fpdf import FPDF
 from datetime import datetime
+from io import BytesIO
 
 # ===============================================================
 # 💾 CSV Dowland functions
@@ -105,12 +106,16 @@ def save_training_plan_to_pdf(text: str, subtitle: str = "Plan Treningowy") -> s
     pdf.set_font("DejaVu", "", 12)
     pdf.multi_cell(0, 8, text)
 
+    # Add timestamp
     pdf.ln(10)
     pdf.set_font("DejaVu", "I", 10)
     pdf.cell(0, 10, f"📅 Wygenerowano: {timestamp}", align="R")
 
     # Save file (dynamic name)
-    filename = f"{subtitle.replace(' ', '_')}_{datetime.now().strftime('%Y-%m-%d')}.pdf"
-    pdf.output(filename)
+    pdf_bytes = BytesIO()
+    pdf.output(pdf_bytes)
+    pdf_bytes.seek(0)  # wracamy na początek
 
-    return filename
+    pdf__training_plan_filename = f"{subtitle.replace(' ', '_')}_{datetime.now().strftime('%Y-%m-%d')}.pdf"
+
+    return pdf_bytes, pdf__training_plan_filename

@@ -640,14 +640,25 @@ if "last_training_plan" in st.session_state:
     st.subheader("📋 Twój plan treningowy")
     st.write(st.session_state["last_training_plan"])
 
+    pdf_bytes, pdf__training_plan_filename = save_training_plan_to_pdf(
+        st.session_state["last_training_plan"],
+        st.session_state["user_main_df_name"]
+    )
+
     # Allow user to export the displayed plan as a downloadable PDF file.
-    if st.button("📄 Pobierz plan treningowy jako PDF"):
-        # Saving to PDF using the function
-        pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"], st.session_state["user_main_df_name"])
-        with open(pdf_file, "rb") as f:
-            st.download_button(
-                label="💾 Kliknij tutaj, aby pobrać PDF",
-                data=f,
-                file_name=pdf_file,
-                mime="application/pdf"
-            )
+    # if st.button("📄 Pobierz plan treningowy jako PDF"):
+    #     # Saving to PDF using the function
+    #     pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"], st.session_state["user_main_df_name"])
+    #     with open(pdf_file, "rb") as f:
+    #         st.download_button(
+    #             label="💾 Kliknij tutaj, aby pobrać PDF",
+    #             data=f,
+    #             file_name=pdf_file,
+    #             mime="application/pdf"
+    #         )
+    st.download_button(
+        label="💾 Pobierz plan treningowy jako PDF",
+        data=pdf_bytes,
+        file_name=pdf__training_plan_filename,
+        mime="application/pdf"
+    )
