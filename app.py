@@ -562,33 +562,6 @@ if st.button("💾 Zapisz przefiltorane dane jako Excel"):
 # Aggregate key metrics from the filtered dataset and persist them in session_state
 # to maintain state across Streamlit app interactions.
 
-
-#==================================================
-
-# total_calories_for_ask_ai = filtered_df["kcal_razem"].sum()
-# # Compering to all money
-# total_money_spend_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
-# total_money_filtred_for_ask_ai = filtered_df["cena_razem"].sum()
-
-# st.session_state["total_calories_for_ask_ai"] = total_calories_for_ask_ai  # save to session_state session_state
-# st.session_state["total_money_spend_for_ask_ai"] = total_money_spend_for_ask_ai  # save to session_state session_state
-# st.session_state["total_money_filtred_for_ask_ai"] = total_money_filtred_for_ask_ai  # save to session_state session_state
-
-# # Displaying the metrics
-# st.metric("Łączna liczba zjedzonych kalorii", f"{st.session_state['total_calories_for_ask_ai']} kcal")
-
-# if filtered_df is not None and not filtered_df.empty:
-#     total_money_filtred_for_ask_ai = filtered_df["cena_razem"].sum()
-# else:
-#     total_money_filtred_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
-
-# st.metric(
-#     "💰 Pieniądze wydane na przefiltrowane produkty",
-#     f"{st.session_state['total_money_filtred_for_ask_ai']:.2f} PLN"
-# )
-
-# st.metric("Całkowite wydane pieniądze", f"{st.session_state['total_money_spend_for_ask_ai']:.2f} PLN")
-
 # Calculate totals for AI
 total_calories_for_ask_ai = filtered_df["kcal_razem"].sum()
 total_money_spend_for_ask_ai = st.session_state["main_df"]["cena_razem"].sum()
@@ -633,29 +606,24 @@ if st.button('Podaj plan treningowy'):
     # Saving the response in session_state to make it available for the PDF button
     st.session_state["last_training_plan"] = answer
 
-# --- Display generated training plan and provide PDF export option ---
-# If a training plan exists in session_state, display it and enable PDF download.
-# The plan remains visible across reruns thanks to session persistence.
+# ===============================================================
+# 📝 Save traning Plan do PDF
+# ===============================================================
+
+# --- Display and Export Training Plan Section ---
+# If a training plan exists in session_state, display it to the user and provide
+# an option to download it as a PDF file. The plan persists across Streamlit reruns
+# due to session_state caching, preventing loss of data after user interactions.
 if "last_training_plan" in st.session_state:
     st.subheader("📋 Twój plan treningowy")
     st.write(st.session_state["last_training_plan"])
-
+    # --- Generate in-memory PDF version of the training plan ---
+    # Returns both the PDF file as bytes (for download) and a timestamped filename.
     pdf_bytes, pdf__training_plan_filename = save_training_plan_to_pdf(
         st.session_state["last_training_plan"],
         st.session_state["user_main_df_name"]
     )
-
-    # Allow user to export the displayed plan as a downloadable PDF file.
-    # if st.button("📄 Pobierz plan treningowy jako PDF"):
-    #     # Saving to PDF using the function
-    #     pdf_file = save_training_plan_to_pdf(st.session_state["last_training_plan"], st.session_state["user_main_df_name"])
-    #     with open(pdf_file, "rb") as f:
-    #         st.download_button(
-    #             label="💾 Kliknij tutaj, aby pobrać PDF",
-    #             data=f,
-    #             file_name=pdf_file,
-    #             mime="application/pdf"
-    #         )
+    # --- Provide user download option for the generated PDF ---
     st.download_button(
         label="💾 Pobierz plan treningowy jako PDF",
         data=pdf_bytes,
