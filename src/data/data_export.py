@@ -98,7 +98,6 @@ def save_training_plan_to_pdf(text: str, subtitle: str = "Plan Treningowy") -> s
 
     # Subtitle (second argument)
     pdf.set_font("DejaVu", "I", 12)
-    # subtitle = f"{subtitle}, dnia: {timestamp}"
     pdf.cell(0, 10, f"{subtitle}, dnia: {timestamp}", ln=True, align="C")
     pdf.ln(10)
 
