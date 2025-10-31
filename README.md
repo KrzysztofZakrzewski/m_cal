@@ -42,23 +42,24 @@ streamlit run app.py
 ## Project Structure
 
 m_cal/
-├── app.py                               # Streamlit Main File
-├── src/             
-│   ├── pdf_parser/                      # PDF parsing modules
-│   ├── data/                            # Data export (CSV, Excel, PDF)
-│   ├── ai_trainer/                      # AI plan generation
-│   ├── pltos/                           # Visualizations and charts
-│   └── utils/                           # Auxiliary functions
-├── json_calories_table                  # Calories table
-├── logs                                 # Logs
-├── logs                                 # Logs
-├── main_dataframe                       # Dataframe template
-├── pdf                                  # PDF with nutrion table
-├── receipt                              # Dynamic receipt img holder
-├── temporary_json_from_receipt          # Dynamic json from img
-├── temporary_json_from_receipt          # Parsed dynamic json for user dataframe
+├── app.py                             # Główny plik aplikacji Streamlit
+├── src/
+│   ├── pdf_parser/                    # Moduły do parsowania PDF
+│   ├── data/                          # Eksport danych (CSV, Excel, PDF)
+│   ├── ai_trainer/                    # Generowanie planów treningowych przez AI
+│   ├── pltos/                         # Wizualizacje i wykresy
+│   └── utils/                         # Funkcje pomocnicze
 │
-└── requirements.txt
+├── json_calories_table/               # Statyczna tabela kalorii w formacie JSON
+├── logs/                              # Logi systemowe
+├── main_dataframe/                    # Szablon bazowego dataframe
+├── pdf/                               # Folder z tabelami odżywczymi (PDF)
+├── receipt/                           # Dynamicznie dodawane obrazy paragonów
+├── temporary_json_from_receipt/       # Dynamiczne JSON-y generowane z obrazów
+├── parsed_json_for_user_dataframe/    # JSON-y połączone i gotowe do budowy dataframe
+│
+└── requirements.txt                   # Lista zależności Pythona
+
 # How it works
 Aplikacja posiada wbudowany plik json z warościami kalorycznymi na 1 porcję prdouktu.
 W razie potrzeby jeżeli pojawią sie nowe produkty uzytkownik może pobrać nowy PDF z "tabelą warości odzywczych" i dodac nowe protuky do jsona z warościami kalorycznymi.
