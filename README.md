@@ -111,7 +111,7 @@ m_cal/
 
 ## 🔒 Security
 
-Create a .env file and add your OpenAI API key:
+Create a .env file **in m_cal** main folder and add your OpenAI API key:
 
 OPENAI_API_KEY=twój_klucz_api
 
