@@ -41,7 +41,7 @@ streamlit run app.py
 
 ## Project Structure
 
-
+```
 m_cal/
 ├── app.py # Main Streamlit application file
 ├── src/
@@ -60,6 +60,7 @@ m_cal/
 ├── parsed_json_for_user_dataframe/ # Final parsed JSONs for dataframe creation
 │
 └── requirements.txt # Python dependencies
+```
 
 # How it works
 Aplikacja posiada wbudowany plik json z warościami kalorycznymi na 1 porcję prdouktu.
