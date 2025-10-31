@@ -41,24 +41,25 @@ streamlit run app.py
 
 ## Project Structure
 
+
 m_cal/
-├── app.py                             # Główny plik aplikacji Streamlit
+├── app.py # Main Streamlit application file
 ├── src/
-│   ├── pdf_parser/                    # Moduły do parsowania PDF
-│   ├── data/                          # Eksport danych (CSV, Excel, PDF)
-│   ├── ai_trainer/                    # Generowanie planów treningowych przez AI
-│   ├── pltos/                         # Wizualizacje i wykresy
-│   └── utils/                         # Funkcje pomocnicze
+│ ├── pdf_parser/ # Modules for PDF parsing
+│ ├── data/ # Data export (CSV, Excel, PDF)
+│ ├── ai_trainer/ # AI-powered training plan generation
+│ ├── pltos/ # Visualizations and charts
+│ └── utils/ # Utility and helper functions
 │
-├── json_calories_table/               # Statyczna tabela kalorii w formacie JSON
-├── logs/                              # Logi systemowe
-├── main_dataframe/                    # Szablon bazowego dataframe
-├── pdf/                               # Folder z tabelami odżywczymi (PDF)
-├── receipt/                           # Dynamicznie dodawane obrazy paragonów
-├── temporary_json_from_receipt/       # Dynamiczne JSON-y generowane z obrazów
-├── parsed_json_for_user_dataframe/    # JSON-y połączone i gotowe do budowy dataframe
+├── json_calories_table/ # Static calorie table in JSON format
+├── logs/ # Application logs
+├── main_dataframe/ # Template for base dataframe
+├── pdf/ # Nutrition table PDFs
+├── receipt/ # Dynamic receipt image storage
+├── temporary_json_from_receipt/ # Temporary JSONs generated from receipts
+├── parsed_json_for_user_dataframe/ # Final parsed JSONs for dataframe creation
 │
-└── requirements.txt                   # Lista zależności Pythona
+└── requirements.txt # Python dependencies
 
 # How it works
 Aplikacja posiada wbudowany plik json z warościami kalorycznymi na 1 porcję prdouktu.
