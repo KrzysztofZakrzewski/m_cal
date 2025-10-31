@@ -1,43 +1,56 @@
 # FitTrack AI 🏋️‍♂️
-## Aplikacja do mierzenia kalorii nabytych w McDonaldzie
+## An app for measuring calories consumed at McDonald's
 ( Proof of concept )
 
-# Aplikacja stworzona do użycia tylko w celach edukacyjnych twórcy
+# This application is intended for educational purposes only.
 
 - Inteligentna aplikacja do analizy danych żywieniowych i generowania planów treningowych na podstawie paragonów i plików PDF.
 
 ## Features
-- 📄 Mozliwość pobrania pliku PDF z "tabelą wartości odżywczych" ze strony McDonalds  
-- ✍🏻 Stworzenie pliku json z wartościami kalorycznymi dla poszczególnych produktów ze PDF z "tabelą wartości odżywczych" lub dodanie nowych do istniejących  
-- 📷 Zczytanie informacji i utworzenia dataframe ze zdjęć paragonów użyciu AI
-- 📄 Wczytanie istniejącego już datframe użytkonika i dodawanie nowych danych z paragonów
-- 📄 Parsowanie informacji uzyskanych z zdjęć paragonów z z wartościami kalorycznymi pozyskanymi z pdf użyciu AI
-- 📊 Możliwość filtracji danych
-- 📊 Wizualizacja danych w postaci wykresów
-- 💾 Eksport sfiltrowanych danych do CSV, Excel
-- 💾 Mozliwośc zmiany nazwy sfiltrowanych danych
-- 🤖 Generowanie spersonalizowanego planu treningowego przy użyciu AI
-- 💾 Zapisanie planu treningowego do PDF
+- 📄 Ability to download a PDF file containing the “Nutritional Values Table” from the McDonald’s website
+
+- ✍🏻 Creation of a JSON file with calorie and nutritional values for individual products extracted from the nutritional table PDF, or adding new entries to an existing file
+
+- 📷 Reading information from receipt images and automatically generating a DataFrame using AI
+
+- 📄 Loading an existing user DataFrame and adding new data from scanned receipts
+
+- 📄 Parsing receipt data and merging it with nutritional information extracted from the PDF using AI
+
+- 📊 Filtering of user data based on selected parameters
+
+- 📊 Visualization of data through interactive charts
+
+- 💾 Export of filtered data to CSV or Excel formats
+
+- 💾 Option to rename filtered datasets before export
+
+- 🤖 Generation of a personalized AI-based training plan
+
+- 💾 Saving the generated training plan as a PDF
 
 ## Requirements / Dependencies
 - python 3.11
-- pip install -r requirements.txt
 - environment.yaml
+- pip install -r requirements.txt
 
-## Instalacja i uruchomienie
+## Installation and Setup
 
-1. Scopiuj repozytorium
-git clone https://github.com/twoj-nick/fittrack-ai.git
-
-2. Idz do
+1. Create the main project folder
 cd m_cal
 
-3. Zainstaluj requirements
-pip install -r requirements.txt
+2. Clone the repository
+git clone https://github.com/twoj-nick/fittrack-ai.git
 
-4. Wpisz
+3. Or using Conda:
+conda env create -f environment.yml
+conda activate m_cal
+
+5. Using terminal type
 streamlit run app.py
 
+Alternative dependencies
+pip install -r requirements.txt
 
 ## Project Structure
 
@@ -63,11 +76,24 @@ m_cal/
 ```
 
 # How it works
-Aplikacja posiada wbudowany plik json z warościami kalorycznymi na 1 porcję prdouktu.
-W razie potrzeby jeżeli pojawią sie nowe produkty uzytkownik może pobrać nowy PDF z "tabelą warości odzywczych" i dodac nowe protuky do jsona z warościami kalorycznymi.
-Użytkownik może wgrywa zdjęcie paragonu -> ze zdjęcia wyciągane są informacji dotyczące produktów -> nazwy produktów sa parsowane aby zgadzały się z tabelą kaloryczną -> wyswietlane są wykresy dotyczące kalori oraz wydanych pieniędzy z każdego produktu lub z danego miesiąca -> uzytkownik może zmienić nazwę dataframeu i zapisac do csv lub exel -> tak uzyskany dataframe można wgrać spowrotem i dodać następne dane z paragonów aktualizując swój dataframe -> Na podstawie przefiltrowanego dataframe i podanych informacjach o użytkowniku tworzy przy pomocy AI plan treningowy -> plan mozna zapisac do PDF
 
-# Technologie
+1. The user uploads a photo of a receipt.
+
+2. The application extracts product names and prices using AI-based OCR.
+
+3. Product names are parsed and matched with the calorie table from the JSON file.
+
+4. The application generates interactive charts showing calorie intake and total spending — per product or by month.
+
+5. The user can rename and export the filtered DataFrame to CSV or Excel.
+
+6. The exported DataFrame can later be re-uploaded to add new receipts and update the data.
+
+7. Based on the filtered data and the user’s personal information, the app generates a personalized AI training plan.
+
+8. The generated plan can be saved as a PDF file for download.
+
+# Technologies
 - python 3.11
 - pandas
 - pathlib
@@ -80,18 +106,19 @@ Użytkownik może wgrywa zdjęcie paragonu -> ze zdjęcia wyciągane są informa
 - openpyxl
 - fpdf2
 - pdfplumber
-- re
 - plotly.express
 - requests
-- urllib.parse
 
-## 🔒 Bezpieczeństwo
-Utwórz plik `.env` i dodaj swój klucz OpenAI:
+## 🔒 Security
+
+Create a .env file and add your OpenAI API key:
 
 OPENAI_API_KEY=twój_klucz_api
 
 ## 👨‍💻 Autor
-Projekt stworzony przez [Twoje Imię](https://github.com/twoj-github).
+Made by [Krzysztof Zakrzewski](https://github.com/KrzysztofZakrzewski).
 
-## 📜 Licencja
-MIT License
+## ⚖️ License
+This project is intended **for educational and non-commercial use only**.  
+All trademarks and brand names are the property of their respective owners.  
+This app is not affiliated with or endorsed by McDonald’s or any other company.
