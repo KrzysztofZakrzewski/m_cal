@@ -20,6 +20,8 @@ def ask_ai(user_info: str, total_calories: float, filtered_period_time: str) -> 
     Napisz realistyczny plan treningowy,
     ile pompek, przysiadów lub kilometrów biegu musi zrobić użytkownik, żeby spalić ten nadmiar.
     Powiec jaki okres czasu został Ci przekazany, w którym użytkownik wchłaniał kalorie.
+    Nie dodawaj HASHTAG-ów, tylko schludne podpunkty.
+    Nie dopisuj zbendnych komentarzy w stylu "ktoś tutaj lubi macka" etc. Bądź PROFESJONALNYM trenerem.
     """
 
     response = get_openai_client().chat.completions.create(
