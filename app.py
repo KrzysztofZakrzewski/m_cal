@@ -28,11 +28,15 @@ def get_openai_client():
 # ===============================================================
 
 # Imports from custom project modules:
+# - scraper: scrape pdf with nutrion table from web
+# - pdf_parser: fuctions extracting data from PDF
 # - dirs: paths and directory management
 # - base_dataframe: main dataframe creation and merging logic
+# - data_export: export data to csv, exel and pdf
 # - utils: general-purpose helpers (file conversion, calorie table loading)
 # - receipt_processing: OCR and JSON parsing of receipts
-# - chars: visualization utilities (Plotly charts
+# - chars: visualization utilities (Plotly charts)
+# - ai_calorie_trainer: create training plan
 from src.dirs import DIRS
 from src.scraper.scaper import (
     scrape_pdf
@@ -99,7 +103,6 @@ temporary_json_parsed_PATH = Path('temporary_json_parsed')
 if 'user_receipt' not in st.session_state:
     st.session_state['user_receipt'] = None
 
-st.title("Dodawanie zdjęć")
 if 'img_receipt_PATH' not in st.session_state:
     st.session_state['img_receipt_PATH'] = None
 
@@ -148,6 +151,13 @@ if "user_info" not in st.session_state:
 if "filtered_period_time" not in st.session_state:
     st.session_state["filtered_period_time"] = None
 
+# ===============================================================
+# 📦 Name of aplication
+# ===============================================================
+st.title("FitTrack AI 🏋️‍♂️")
+st.title("Aplikacja do mierzenia kalorii nabytych w McDonaldzie")
+st.text("( Proof of concept )")
+
 # Hardcore the url adres for pdf
 url = "https://cdn.mcdonalds.pl/uploads/20251021094322/352978-tabela-wo-8-11-2023-mop.pdf?openOutsideMcd=true"
 
@@ -181,9 +191,9 @@ if st.button('Sparsuj PDF'):
 
 # ===============================================================
 # 📦 LOAD data frame
+# ===============================================================
 # If the user already has a saved dataset (CSV), 
 # they can upload it here for further analysis.
-# ===============================================================
 st.markdown("""
     <style>
     .compact-header {
