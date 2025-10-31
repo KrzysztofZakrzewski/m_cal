@@ -1,7 +1,10 @@
-pdf/
-logs/
+pdf/*
+!.gitkeep
+logs/*
+!.gitkeep
 img/
-receipt/
+receipt/*
+!.gitkeep
 
 # json_from_recepit.json
 temporary_json_from_receipt/*
