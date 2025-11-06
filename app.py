@@ -145,7 +145,7 @@ if "filtered_df" not in st.session_state:
 
 # User info for ask_ai()
 if "user_info" not in st.session_state:
-    st.session_state["user_info"] = None
+    st.session_state["user_info"] = ''
 
 # filtered_period_time for argument for ask_ai()
 if "filtered_period_time" not in st.session_state:
@@ -154,7 +154,7 @@ if "filtered_period_time" not in st.session_state:
 # ===============================================================
 # 📦 Name of aplication
 # ===============================================================
-st.title("FitTrack AI 🏋️‍♂️")
+st.title("M_cal. FitTrack AI 🏋️‍♂️")
 st.title("Aplikacja do mierzenia kalorii nabytych w McDonaldzie")
 st.text("( Proof of concept )")
 
@@ -611,7 +611,7 @@ if st.button('Podaj plan treningowy'):
                     total_calories_for_ask_ai,
                     st.session_state["filtered_period_time"])
     # View answer form ask_ai
-    st.text_area(answer)
+    st.write(answer)
 
     # Saving the response in session_state to make it available for the PDF button
     st.session_state["last_training_plan"] = answer
