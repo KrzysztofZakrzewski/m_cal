@@ -1,8 +1,9 @@
-from src.dirs import DIRS
-import pdfplumber
+from pathlib import Path
 import re
 import json
 import os
+from src.dirs import DIRS
+import pdfplumber
 
 def extracting_text_from_pdf(pdf_path_to_create_text):
     with pdfplumber.open(pdf_path_to_create_text) as pdf:
@@ -112,10 +113,10 @@ def new_caloris_table_from_pdf_json(text: str, sections=None) -> dict:
                     # skip products where 5th value is invalid
                     continue
 
-            # stop processing after 'Syrop karmelowy'
-            if "Syrop karmelowy" in product_name:
-                # ensure Syrop karmelowy is last
-                result["Syrop karmelowy"] = int(round(float(numbers_tokens[4])))
+            # stop processing after 'Syrop o smaku karmelowym'
+            if "Syrop o smaku karmelowym" in product_name:
+                # ensure Syrop o smaku karmelowym is last
+                result["Syrop o smaku karmelowym"] = int(round(float(numbers_tokens[4])))
                 return result
 
             with open(DIRS['json_calories_table']/"offer_classic_temporary.json", "w", encoding="utf-8") as f:
@@ -126,9 +127,6 @@ def new_caloris_table_from_pdf_json(text: str, sections=None) -> dict:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
 
-import json
-import os
-from pathlib import Path
 
 def merge_json_files(tablica_a_path: Path, tablica_b_path: Path) -> None:
     """

@@ -610,11 +610,12 @@ if st.button('Podaj plan treningowy'):
     answer = ask_ai(st.session_state["user_info"],
                     total_calories_for_ask_ai,
                     st.session_state["filtered_period_time"])
-    # View answer form ask_ai
-    st.write(answer)
 
     # Saving the response in session_state to make it available for the PDF button
     st.session_state["last_training_plan"] = answer
+
+    # View answer form ask_ai
+    # st.write(answer)
 
 # ===============================================================
 # 📝 Save traning Plan do PDF
