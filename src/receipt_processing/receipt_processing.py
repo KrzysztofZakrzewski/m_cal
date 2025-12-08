@@ -181,7 +181,9 @@ def parsing_data_from_receipt_raw_into_json() -> Optional[Dict[str, Any]]:
     "0,4l Coca Cola M": "Coca-Cola 0,4l",
     "0,2l Cappucino": "Cappuccino 0,2l",
     "MuffinWiepJajko": "McMuffin Wieprzowy z Jajkiem",
-    "0,4 CarLatMacch": "Caramel Latte Macchiato 0,4l"
+    "0,4 CarLatMacch": "Caramel Latte Macchiato 0,4l",
+    "Drwala": "Burger Drwala",
+    "Zakrencone Frytki": "Frytki Zakręcone"
 
     JEŻELI JSON NIE BĘDZIE ZAWIERAŁ INFORMACJI STWÓRZ PUSTEGO JSON
     Zwróć poprawiony JSON.
